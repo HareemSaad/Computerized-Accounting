@@ -1,0 +1,17 @@
+.erc20-cont{
+    display: flex;
+    justify-content: center;
+
+}
+
+.erc20-inner-cont{
+    width: 100%;
+}
+
+.content {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    width: 100%;
+}
