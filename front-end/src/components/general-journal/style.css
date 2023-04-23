@@ -1,12 +1,240 @@
-.erc20-cont{
+  .content .MuiInput-underline:before {
+    border-bottom: 1px solid #00aedc;
+  }
+  .content .MuiInput-underline:after {
+    border-bottom: 1px solid #00aedc;
+  }
+  .content .MuiInput-underline:hover:not(.Mui-disabled):before {
+    border-bottom: 1px solid #767884;
+  }
+  .content .MuiFormLabel-root.Mui-focused,
+  .content .MuiInputLabel-shrink {
+    color: #00aedc;
+  }
+  .form-wrapper .content li a {
+    font-family: "Montserrat", sans-serif;
+    font-size: 1.27em;
+    text-decoration: none;
+    color: #5f6060;
     display: flex;
-    justify-content: center;
-
-}
-
-.erc20-inner-cont{
+    gap: 1em;
+    align-items: center;
+  }
+  .form-wrapper .content .list-group li {
+    border: 0px;
+    margin: 15px 0;
+    text-align: left;
+    transition: background 0.5s ease-in;
+  }
+  .form-wrapper .content .list-img {
+    width: 20%;
+    text-align: center;
+  }
+  .form-wrapper .content .list-desc {
+    width: 75%;
+    font-family: "Montserrat", sans-serif;
+  }
+  .form-wrapper .content .list-group li:hover .arrow {
+    color: #fff;
+  }
+  .form-wrapper .content .arrow {
+    width: 2%;
+    color: #919191;
+    font-size: 4em;
+    font-weight: 200;
+    font-style: normal;
+    transition: 0.9s;
+  }
+  .form-wrapper .content .arrow:before {
+    content: ">";
+  }
+  .content .MuiFormControl-root.MuiTextField-root {
     width: 100%;
-}
+  }
+  .erc20-cont {
+    margin: 2em 0 2em 0;
+  }
+  .form-wrapper .adjust-img {
+    width: 18%;
+  }
+  .login-container li a {
+    text-decoration: none;
+    color: #000;
+  }
+  .makeStyles-paper-2 .login-container h2 {
+    margin: 10px 0 30px 0;
+  }
+  .help-container {
+    margin: 0 0 10px 0;
+  }
+  .help-container .help-title {
+    text-align: right;
+    text-decoration: none;
+    display: block;
+    cursor: pointer;
+  }
+  .help-container .help-box {
+    border: 1px solid #a6e8f9;
+    background: #ecfafe;
+    padding: 10px 5px;
+    text-align: left;
+    margin: 10px 0 0 0;
+  }
+  .help-container .help-box .help-text {
+    color: #6c6c6c;
+  }
+  .checkbox-box {
+    display: flex;
+    margin: 30px 0;
+  }
+  .checkbox-box > label {
+    width: 20%;
+    text-align: left;
+    color: #00aedc;
+    font-size: 1.2em;
+    padding: 10px 0;
+  }
+  .checkbox-group {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+  }
+  .checkbox-group label.MuiFormControlLabel-root {
+    width: 31%;
+  }
+  .checkbox-group .MuiCheckbox-colorPrimary.Mui-checked,
+  .checkbox-group .MuiCheckbox-root {
+    color: #00aedc;
+  }
+  .card-list {
+    margin: 0 auto 10px auto;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    align-content: center;
+    width: 80%;
+    justify-content: space-between;
+    gap: 15px;
+  }
+  .card-list li {
+    /* width: 31%; */
+    padding: 0 0 15px 0;
+    flex: 1 0 31%;
+  }
+  .card-list li a {
+    flex-direction: column;
+    padding: 20px;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    width: 100%;
+    opacity: 0.5;
+    color: #2c2c2c !important;
+    font-size: 1.8em !important;
+  }
+  .card-list li a.selected {
+    border: 1px solid #75e4fb;
+    opacity: 1;
+    box-shadow: 4px 3px 15px 2px #00c7f338;
+    position: relative;
+  }
+  .card-list li a.selected:before {
+    content: "\f058";
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    font-family: "Font Awesome 5 Free";
+    -moz-osx-font-smoothing: grayscale;
+    -webkit-font-smoothing: antialiased;
+    display: inline-block;
+    font-style: normal;
+    font-variant: normal;
+    text-rendering: auto;
+    line-height: 1;
+    color: #82b15b;
+  }
+  .makeStyles-paper-2 {
+    position: absolute;
+    border-style: none;
+    width: 40%;
+    box-shadow: 0px 3px 5px -1px rgb(0 0 0 / 20%),
+      0px 5px 8px 0px rgb(0 0 0 / 14%), 0px 1px 14px 0px rgb(0 0 0 / 12%);
+    padding: 16px 32px 24px;
+    border-radius: 10px;
+    background-color: #fff;
+  }
+  @media (max-width: 1024px) {
+    .form-wrapper .steps {
+      overflow-x: auto;
+    }
+    .form-wrapper .steps li a {
+      font-size: 1em;
+    }
+    .form-wrapper .content .list-img img {
+      width: 100%;
+    }
+    .form-wrapper .form-card .form-header {
+      font-size: 0.8em;
+      padding: 10px 0;
+    }
+    .form-wrapper .form-card .form-header img {
+      width: 100%;
+    }
+  }
+  @media (max-width: 800px) {
+    .wrapper {
+      flex-direction: column;
+    }
+    .checkbox-group {
+      flex-direction: column;
+    }
+    .checkbox-box > label {
+      width: 50%;
+    }
+    .form-wrapper {
+      width: 100%;
+    }
+    .form-wrapper .content > img {
+      width: 100%;
+    }
+    .form-wrapper .form-card {
+      width: 100%;
+    }
+    .form-wrapper .form-card .form-header h1 {
+      font-size: 1em;
+      font-weight: bold;
+      margin: 0;
+    }
+    .form-wrapper .form-card .form-header h1 img {
+      width: 20%;
+    }
+    .form-wrapper .content {
+      padding: 1em 1em 2em 1em;
+    }
+    .form-wrapper .steps li {
+      width: auto;
+      padding-left: 2%;
+      padding-right: 2%;
+      white-space: nowrap;
+    }
+    .form-wrapper .steps li a {
+      font-size: 0.7em;
+      padding: 10px;
+    }
+    .card-list li {
+      width: 40%;
+    }
+    .card-list li img {
+      width: 40%;
+    }
+    .makeStyles-paper-2 {
+      width: 95% !important;
+      left: 45% !important;
+    }
+  }
+  
 
 .content {
     display: flex;
