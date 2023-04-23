@@ -234,6 +234,10 @@
       left: 45% !important;
     }
   }
+
+  .w-25 {
+    width: 100px;
+  }
   
 
 .content {

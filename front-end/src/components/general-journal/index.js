@@ -195,16 +195,16 @@ export const GeneralJournal = () => {
                 required
                 label="Account"
                 >
-                <MenuItem value="A">Adjustment</MenuItem>
-                <MenuItem value="C">Closing</MenuItem>
-                <MenuItem value="N">Normal</MenuItem>
+                <MenuItem value="A" name='ADJ'>Adjustment</MenuItem>
+                <MenuItem value="C" name='CLO'>Closing</MenuItem>
+                <MenuItem value="N" name='NOR'>Normal</MenuItem>
                 </Select>
             </FormControl>
             </td>
             <td>
             <TextField
                 value={data?.description}
-                onChange={(e) => updateToken(index, "supply", e.target.value)}
+                onChange={(e) => updateToken(index, "description", e.target.value)}
                 className="textfield"
                 variant="standard"
                 required
