@@ -5,6 +5,7 @@ const cookieParser = require("cookie-parser")
 const dotenv = require('dotenv').config()
 const mysql = require('mysql');
 let poolRoutes = require('./routes/routes');
+const tableCreation = require('./scripts/tableCreation.js');
 const port = 3000;
 
 const app = express();
@@ -19,21 +20,22 @@ app.use(express.json())
 app.use(bodyParser.urlencoded({ extended: true })); // for parsing application/x-www-form-urlencoded
 app.use(cookieParser())
 
-const con = mysql.createConnection({
-    host: process.env.DB_SERVER,
-    user: process.env.DB_USERNAME,
-    password: process.env.DB_PASSWORD,
-    database: process.env.DB_USERNAME
-  });
-  
+const connection = mysql.createConnection({
+  host: process.env.DB_SERVER,
+  user: process.env.DB_USERNAME,
+  password: process.env.DB_PASSWORD,
+  database: process.env.DB_USERNAME
+});
 
 main().catch(err => console.log(err));
 
 async function main() {
-    con.connect(function(err) {
-        if (err) throw err;
-        console.log("Connected!");
-      });
+  // DON'T UNCOMMENT THESE
+  // tableCreation.createTAcountTable(301, "Owner Equity")
+  // tableCreation.createTAcountTable(401, "Owner Withdrawal")
+  // tableCreation.createHeadsTable()
+  // tableCreation.createGeneralJournalTable()
+  // tableCreation.dropAllTables()
 }
 
 app.use("/", poolRoutes.routes);
