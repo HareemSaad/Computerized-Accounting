@@ -1,168 +1,79 @@
 import React, { useState, useEffect } from "react";
-import { FormControl, InputLabel, MenuItem, Select } from "@mui/material";
+import { Button, FormControl, InputLabel, MenuItem, Select } from "@mui/material";
 import TextField from "@mui/material/TextField";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import Checkbox from "@mui/material/Checkbox";
 import Tooltip from "@mui/material/Tooltip";
 import './style.css';
-// const useStyles = makeStyles((theme) => ({
-//     root: {
-//       "& > *": {
-//         margin: theme.spacing(1),
-//         width: "500px",
-//       },
-//     },
-//   }
-// ));
 
-const initial = [{
-    flag : '',
-    account : '',
-    decription : '',
-    debit : '',
-}]
-  
+// const form = [{
+//     flag : 'N',
+//     account : 101,
+//     decription : '',
+//     debitTransaction : false,
+//     creditTransaction : false,
+//     debitAmount : 0,
+//     creditAmount : 0,
+// }]
+
 export const GeneralJournal = () => {
-    // const classes = useStyles();
-    // const history = useHistory();
+    const [transactions, setTransactions] = useState([{ 
+        flag : 'N', 
+        account : 101, 
+        decription : '', 
+        debitTransaction : false, 
+        creditTransaction : false, 
+        debitAmount : 0, 
+        creditAmount : 0 
+    }]);
 
-    // const [store, dispatch] = useStore();
-    // const [apiRes, setApiRes] = useState();
-    const [formData, setFormData] = useState({
-        tokens: [{ type: true, name: "", id: "", supply: 1 }],
-        uri: "",
+    useEffect (() => {
+        console.log(transactions);
+    }, [transactions])
 
-        network: null,
-        ownable: false,
-        mintable: false,
-        burnable: false,
-        access_control: false,
-    });
+    // on submit check if sum debit == sum credit
 
-    console.log(formData);
-    // const nextStep = () => {
-    //     if (formData?.tokens?.find((data) => data.name === "")) {
-    //     notify("error", "Token Name is required");
-    //     return false;
-    //     }
-    //     if (formData?.tokens?.find((data) => data.id === "")) {
-    //     notify("error", "Token Id is required");
-    //     return false;
-    //     }
-    //     if (formData?.tokens?.find((data) => data.supply < 1)) {
-    //     notify("error", "Token supply must be greater or equal to 1");
-    //     return false;
-    //     }
-    //     if (formData?.uri === "") {
-    //     notify("error", "Token URI is not defined.");
-    //     return false;
-    //     }
-    //     if (formData?.symbol === "") {
-    //     notify("error", "Token Symbol is required");
-    //     return false;
-    //     }
-    //     if (formData?.supply === "") {
-    //     notify("error", "Token Supply is required");
-    //     return false;
-    //     }
-    //     if (formData?.decimal === "") {
-    //     notify("error", "Token Decimal is required");
-    //     return false;
-    //     }
-    //     TokenService.setToken(1155, formData);
-    //     if (store.network === null) {
-    //     history.push("/form/network");
-    //     } else {
-    //     history.push("/form/confirm");
-    //     }
-    // };
-
-    const updateForm = async (name, value) => {
-        let data = Object.assign({}, formData);
+    const updateTransactionList = async (index, name, value) => {
+        let data = Object.assign([], transactions);
         if (typeof name === "object") {
-        data = { ...data, ...name };
-        } else {
-        data[name] = value;
+          data[index] = { ...data[index], ...name };
+        } else if (name === 'debitAmount') {
+            data[index]['debitTransaction'] = true
+            data[index][name] = parseFloat(value);
+        } else if (name === 'creditAmount') {
+            data[index]['creditTransaction'] = true;
+            data[index][name] = parseFloat(value);
+        }else {
+          data[index][name] = value;
         }
-        setFormData(data);
-    };
 
-    const updateToken = async (index, name, value) => {
-        let data = Object.assign({}, formData);
-        if (typeof name === "object") {
-        data.tokens[index] = { ...data.tokens[index], ...name };
-        } else {
-        data.tokens[index][name] = value;
-        }
-        setFormData(data);
-    };
+        console.log("data", data);
+        setTransactions(data);
+      };
 
     const removeRow = (i) => {
-        let data = Object.assign({}, formData);
-        delete data.tokens.splice(i, 1);
-        setFormData(data);
-    };
+        const newTransactions = [...transactions];
+        if (newTransactions.length == 1) {return}
+        newTransactions.splice(i, 1);
+        setTransactions(newTransactions);
+      };
 
     const addRow = (e) => {
-        let data = Object.assign({}, formData);
-        data.tokens.push({ type: true, name: "", id: "", supply: 1 });
-        setFormData(data);
+        if (transactions.length == 3) {return}
+        setTransactions([...transactions, {
+            flag: 'N',
+            account: 101,
+            description: '',
+            debitTransaction: false,
+            creditTransaction: false,
+            debitAmount: 0,
+            creditAmount: 0
+        }]);
     };
-
-    // useEffect(() => {
-    //     store.steps.push("form");
-    //     handleStep(dispatch, store.steps);
-    //     let data = {
-    //     tokens: [{ type: true, name: "", id: "", supply: 1 }],
-    //     uri: "",
-    //     ownable: false,
-    //     mintable: false,
-    //     burnable: false,
-    //     access_control: false,
-    //     };
-
-    //     setTimeout(() => {
-    //     if (TokenService.tokenType === 1155) {
-    //         data = TokenService.data;
-    //         console.log(data, "data");
-    //     }
-    //     setFormData({
-    //         tokens: data.tokens,
-    //         uri: data.uri,
-    //         ownable: data.ownable,
-    //         mintable: data.mintable,
-    //         burnable: data.burnable,
-    //         network: store.network === null ? null : store.network,
-
-    //         access_control: data.access_control,
-    //     });
-    //     }, 500);
-    //     return () => {
-    //     setFormData({
-    //         tokens: [{ type: true, name: "", id: "", supply: 1 }],
-    //         uri: "",
-    //         ownable: false,
-    //         mintable: false,
-    //         burnable: false,
-    //         access_control: false,
-    //     });
-    //     };
-    // }, []);
-    /*
-        return (
-            <div className="content">
-                <Helmet>
-                    <link rel="canonical" href={`${window.env.SITE_URL}form/erc1155`} />
-                </Helmet>
-                <div className="erc20-cont">
-                    <h2 className="erc20-">ERC1155 is not available right now.</h2>
-                </div>
-            </div>
-        );*/
 
     const tokenRow = (data, index) => {
         return (
-        <tr>
+        <tr key={index}>
             <td>
             <button
                 className="btn text-danger fa fa-remove"
@@ -173,27 +84,11 @@ export const GeneralJournal = () => {
             <FormControl className="textfield MuiTextField-root mb-3">
                 <Select
                 value={data?.flag}
-                onChange={(e) => updateToken(index, "flag", e.target.value)}
+                onChange={(e) => updateTransactionList(index, "flag", e.target.value)}
                 className="textfield"
                 variant="standard"
                 required
                 label="Flag"
-                >
-                <MenuItem value="A">Adjustment</MenuItem>
-                <MenuItem value="C">Closing</MenuItem>
-                <MenuItem value="N">Normal</MenuItem>
-                </Select>
-            </FormControl>
-            </td>
-            <td className="w-25">
-            <FormControl className="textfield MuiTextField-root mb-3">
-                <Select
-                value={data?.account}
-                onChange={(e) => updateToken(index, "account", e.target.value)}
-                className="textfield"
-                variant="standard"
-                required
-                label="Account"
                 >
                 <MenuItem value="A" name='ADJ'>Adjustment</MenuItem>
                 <MenuItem value="C" name='CLO'>Closing</MenuItem>
@@ -201,10 +96,26 @@ export const GeneralJournal = () => {
                 </Select>
             </FormControl>
             </td>
+            <td className="w-25">
+            <FormControl className="textfield MuiTextField-root mb-3">
+                <Select
+                value={data?.account}
+                onChange={(e) => updateTransactionList(index, "account", e.target.value)}
+                className="textfield"
+                variant="standard"
+                required
+                label="Account"
+                >
+                <MenuItem value="101" name='101'>101</MenuItem>
+                <MenuItem value="102" name='102'>102</MenuItem>
+                <MenuItem value="103" name='103'>103</MenuItem>
+                </Select>
+            </FormControl>
+            </td>
             <td>
             <TextField
                 value={data?.description}
-                onChange={(e) => updateToken(index, "description", e.target.value)}
+                onChange={(e) => updateTransactionList(index, "description", e.target.value)}
                 className="textfield"
                 variant="standard"
                 required
@@ -213,7 +124,7 @@ export const GeneralJournal = () => {
             <td>
             <TextField
                 value={data?.debit}
-                onChange={(e) => updateToken(index, "debit", e.target.value)}
+                onChange={(e) => updateTransactionList(index, "debitAmount", e.target.value)}
                 className="textfield"
                 variant="standard"
                 required
@@ -224,33 +135,60 @@ export const GeneralJournal = () => {
     };
 
     return (
-        <div className="content">
-        <div className="erc20-cont">
-            <div className="erc20-inner-cont">
-            {/* <h2 className="erc20-">Create your ERC1155 token</h2> */}
-            <div className="erc20-">
-                <table className="table table-bordered">
-                <thead>
-                    <tr>
-                    <th>
-                        <button
-                        className="btn text-success fa fa-plus-circle"
-                        onClick={addRow}
-                        ></button>
-                    </th>
-                    <th>Flag</th>
-                    <th>Account</th>
-                    <th>Decription</th>
-                    <th>Debit</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {initial.map((item, index) => {return tokenRow(item, index);})}
-                </tbody>
-                </table>
+        <>
+            <div className="content">
+            <div className="erc20-cont">
+                <div className="erc20-inner-cont">
+                {/* <h2 className="erc20-">Create your ERC1155 token</h2> */}
+                <div className="erc20-">
+                    <table className="table table-bordered">
+                    <thead>
+                        <tr>
+                        <th>
+                            <button
+                            className="btn text-success fa fa-plus-circle"
+                            onClick={addRow}
+                            ></button>
+                        </th>
+                        <th>Flag</th>
+                        <th>Account</th>
+                        <th>Decription</th>
+                        <th>Debit</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {transactions.map((item, index) => {return tokenRow(item, index);})}
+                    </tbody>
+                    </table>
+                </div>
+                </div>
             </div>
+            {/* <div className="erc20-cont">
+                <div className="erc20-inner-cont">
+                <div className="erc20-">
+                    <table className="table table-bordered">
+                    <thead>
+                        <tr>
+                        <th>
+                            <button
+                            className="btn text-success fa fa-plus-circle"
+                            onClick={addRow}
+                            ></button>
+                        </th>
+                        <th>Flag</th>
+                        <th>Account</th>
+                        <th>Decription</th>
+                        <th>Debit</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {transactions.map((item, index) => {return tokenRow(item, index);})}
+                    </tbody>
+                    </table>
+                </div>
+                </div>
+            </div> */}
             </div>
-        </div>
-        </div>
+        </>
     );
-};
+}
