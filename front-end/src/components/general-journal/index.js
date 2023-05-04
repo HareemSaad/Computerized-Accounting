@@ -177,7 +177,7 @@ export const GeneralJournal = () => {
                 <MenuItem value="103" name='103'>103</MenuItem> */}
                 {
                     Object.values(tables).map(({ tableId, name }) => (
-                        <MenuItem value={tableId} name={tableId}>{`${tableId} - ${name}`}</MenuItem>
+                        <MenuItem key={tableId} value={tableId} name={tableId}>{`${tableId} - ${name}`}</MenuItem>
                       ))
                 }
                 </Select>
@@ -245,7 +245,7 @@ export const GeneralJournal = () => {
                 <MenuItem value="103" name='103'>103</MenuItem> */}
                 {
                     Object.values(tables).map(({ tableId, name }) => (
-                        <MenuItem value={tableId} name={tableId}>{`${tableId} - ${name}`}</MenuItem>
+                        <MenuItem key={tableId} value={tableId} name={tableId}>{`${tableId} - ${name}`}</MenuItem>
                       ))
                 }
                 </Select>
