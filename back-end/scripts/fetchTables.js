@@ -56,7 +56,6 @@ const fetchAllTables = async (req, res) => {
     // });
   
     // Define the query to fetch all tables
-    console.log(1);
     const showTableQuery = `SELECT * FROM Heads`;
     
     // Execute the query and return a Promise
@@ -72,11 +71,9 @@ const fetchAllTables = async (req, res) => {
       });
     });
     
-    console.log(2);
     // Wait for the query to complete and send the response
     try {
       const tables = await queryPromise;
-      console.log(3);
       console.log('tables :: ', tables);
       // connection.end();
       res.status(200).send(tables);
