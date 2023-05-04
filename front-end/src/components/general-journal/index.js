@@ -19,7 +19,7 @@ import './style.css';
 export const GeneralJournal = () => {
     const [debitTransactions, setDebitTransactions] = useState([{ 
         flag : 'N', 
-        account : 101, 
+        account : "", 
         decription : '', 
         debitTransaction : false,
         debitAmount : 0
@@ -27,15 +27,47 @@ export const GeneralJournal = () => {
 
     const [creditTransactions, setCreditTransactions] = useState([{ 
         flag : 'N', 
-        account : 101, 
+        account : "", 
         decription : '',  
         creditTransaction : false,
         creditAmount : 0 
     }]);
 
+    const [tables, setTables] = useState([]);
+
     useEffect (() => {
         console.log(debitTransactions);
     }, [debitTransactions])
+
+    useEffect (() => {
+        console.log(creditTransactions);
+    }, [creditTransactions])
+
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const res = await fetch("http://localhost:3000/fetchTables", {
+                    method: 'POST',
+                    headers: {
+                        "Content-Type": "application/json"
+                    }
+                });
+                const json = await res.json();
+                // const json = JSON.parse(await res.json());
+                setTables(json);
+                console.log("pop", json);
+            } catch (error) {
+                console.log(error);
+            }
+        };
+        fetchData();
+    }, []);
+      
+
+    // useEffect (() => {
+    //     console.log("tables :: ", tables);
+    //     console.log(typeof(tables));
+    // }, [tables])
 
     // on submit check if sum debit == sum credit
 
@@ -140,9 +172,14 @@ export const GeneralJournal = () => {
                 required
                 label="Account"
                 >
-                <MenuItem value="101" name='101'>101</MenuItem>
+                {/* <MenuItem value="101" name='101'>101</MenuItem>
                 <MenuItem value="102" name='102'>102</MenuItem>
-                <MenuItem value="103" name='103'>103</MenuItem>
+                <MenuItem value="103" name='103'>103</MenuItem> */}
+                {
+                    Object.values(tables).map(({ tableId, name }) => (
+                        <MenuItem value={tableId} name={tableId}>{`${tableId} - ${name}`}</MenuItem>
+                      ))
+                }
                 </Select>
             </FormControl>
             </td>
@@ -203,9 +240,14 @@ export const GeneralJournal = () => {
                 required
                 label="Account"
                 >
-                <MenuItem value="101" name='101'>101</MenuItem>
+                {/* <MenuItem value="101" name='101'>101</MenuItem>
                 <MenuItem value="102" name='102'>102</MenuItem>
-                <MenuItem value="103" name='103'>103</MenuItem>
+                <MenuItem value="103" name='103'>103</MenuItem> */}
+                {
+                    Object.values(tables).map(({ tableId, name }) => (
+                        <MenuItem value={tableId} name={tableId}>{`${tableId} - ${name}`}</MenuItem>
+                      ))
+                }
                 </Select>
             </FormControl>
             </td>

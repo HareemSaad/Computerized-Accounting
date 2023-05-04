@@ -1,4 +1,5 @@
-const express = require("express") //import express
+const express = require('express');
+const cors = require('cors');
 const bodyParser = require("body-parser") //import body parser
 const path = require('path')
 const cookieParser = require("cookie-parser")
@@ -6,10 +7,14 @@ const dotenv = require('dotenv').config()
 const mysql = require('mysql');
 let poolRoutes = require('./routes/routes');
 const tableCreation = require('./scripts/tableCreation.js');
+const fetching = require('./scripts/fetchTables.js');
 const port = 3000;
 
 const app = express();
 app.use(express.json())
+app.use(cors());
+// app.use(cors({ origin: 'http://localhost:3001' }));
+
 
 /**
  * to render css
@@ -24,22 +29,30 @@ const connection = mysql.createConnection({
   host: process.env.DB_SERVER,
   user: process.env.DB_USERNAME,
   password: process.env.DB_PASSWORD,
-  database: process.env.DB_USERNAME
+  database: process.env.DB_NAME
 });
 
 main().catch(err => console.log(err));
 
 async function main() {
+  // Connect to the database
+  connection.connect((err) => {
+    if (err) throw err;
+    console.log('Connected to the MySQL server!');
+  });
+  
   // DON'T UNCOMMENT THESE
   // tableCreation.createTAcountTable(301, "Owner Equity")
   // tableCreation.createTAcountTable(401, "Owner Withdrawal")
   // tableCreation.createHeadsTable()
   // tableCreation.createGeneralJournalTable()
   // tableCreation.dropAllTables()
+  // fetching.fetchTables()
 }
 
 app.use("/", poolRoutes.routes);
 
 app.get('/', (req, res) => res.send('Hello World!'));
+// app.get('/fetchTables', (req, res) => res.send('Hello World!'));
 
 app.listen(port, () => console.log(`Express app running on port ${port}!`));
