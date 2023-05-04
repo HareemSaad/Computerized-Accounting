@@ -70,6 +70,9 @@ export const GeneralJournal = () => {
     // }, [tables])
 
     // on submit check if sum debit == sum credit
+    function submit() {
+        console.log('object');
+    }
 
     const updateDebitTransactionList = async (index, name, value) => {
         let data = Object.assign([], debitTransactions);
@@ -327,7 +330,23 @@ export const GeneralJournal = () => {
                 </div>
                 </div>
             </div>
+            <div className="erc20-cont d-flex gap-2 mt-2">
+              <button
+                onClick={submit}
+                className="btn btn-info p-3 text-white w-100"
+              >
+                Submit
+              </button>
+              </div>
             </div>
+            {/* <div className="d-flex gap-2 mt-2">
+              <button
+                onClick={submit}
+                className="btn btn-info p-3 text-white w-100"
+              >
+                Create Your Token
+              </button>
+              </div> */}
         </>
     );
 }
