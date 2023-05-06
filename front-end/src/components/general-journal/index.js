@@ -103,6 +103,33 @@ export const GeneralJournal = () => {
         if (creditAmount !== debitAmount) {notify("error", 'Debit & Credit amount must be equal')}
         console.log('ct :: ', creditTransactions);
         console.log('dt :: ', debitTransactions);
+        // split to separate transactions done at the backend
+        console.log("json", JSON.stringify({
+            creditTransactions: creditTransactions,
+            debitTransactions: debitTransactions
+          }));
+        const fetchData = async () => {
+            try {
+                const res = await fetch("http://localhost:3000/insertTxns", {
+                    method: 'POST',
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        creditTransactions: creditTransactions,
+                        debitTransactions: debitTransactions
+                    })
+                });
+
+                const json = await res.json();
+                // const json = JSON.parse(await res.json());
+                // setTables(json);
+                console.log("pop", json);
+            } catch (error) {
+                console.log(error);
+            }
+        };
+        fetchData();
     }
 
     const updateDebitTransactionList = async (index, name, value) => {
