@@ -5,11 +5,13 @@ import FormControlLabel from "@mui/material/FormControlLabel";
 import Checkbox from "@mui/material/Checkbox";
 import Tooltip from "@mui/material/Tooltip";
 import './style.css';
+import { notify } from "../utils/error-box";
+import "react-toastify/dist/ReactToastify.css";
 
 // const form = [{
 //     flag : 'N',
 //     account : 101,
-//     decription : '',
+//     description : '',
 //     debitTransaction : false,
 //     creditTransaction : false,
 //     debitAmount : 0,
@@ -20,7 +22,7 @@ export const GeneralJournal = () => {
     const [debitTransactions, setDebitTransactions] = useState([{ 
         flag : 'N', 
         account : "", 
-        decription : '', 
+        description : '', 
         debitTransaction : false,
         debitAmount : 0
     }]);
@@ -28,9 +30,9 @@ export const GeneralJournal = () => {
     const [creditTransactions, setCreditTransactions] = useState([{ 
         flag : 'N', 
         account : "", 
-        decription : '',  
+        description : '',  
         creditTransaction : false,
-        creditAmount : 0 
+        creditAmount : 0
     }]);
 
     const [tables, setTables] = useState([]);
@@ -62,7 +64,6 @@ export const GeneralJournal = () => {
         };
         fetchData();
     }, []);
-      
 
     // useEffect (() => {
     //     console.log("tables :: ", tables);
@@ -71,7 +72,31 @@ export const GeneralJournal = () => {
 
     // on submit check if sum debit == sum credit
     function submit() {
-        console.log('object');
+        // check for type
+        const amountRe = /^\d{1,10}(\.\d{1,2})?$/;
+        const descriptionRe = /^[a-zA-Z0-9 ]{0,50}$/;
+        let AmountFlag = false, DescriptionFlag = false, AccountFlag = false;
+        let creditAmount = 0, debitAmount = 0;
+        for (let index = 0; index < creditTransactions.length; index++) {
+            const element = creditTransactions[index];
+            !amountRe.test(parseFloat(element.creditAmount)) ? AmountFlag = true : creditAmount += parseFloat(element.creditAmount)
+            if (!descriptionRe.test(element.description)) (DescriptionFlag = true)
+            if (element.account === "" || element.account === undefined) (AccountFlag = true)
+            if (AmountFlag && DescriptionFlag && AccountFlag) {break}
+        }
+        for (let index = 0; index < debitTransactions.length; index++) {
+            const element = debitTransactions[index];
+            // check amount 
+            !amountRe.test(parseFloat(element.debitAmount)) ? AmountFlag = true : debitAmount += parseFloat(element.debitAmount)
+            if (!descriptionRe.test(element.description)) (DescriptionFlag = true)
+            if (element.account === "" || element.account === undefined) (AccountFlag = true)
+            if (AmountFlag && DescriptionFlag && AccountFlag) {break}
+        }
+        if (AmountFlag) {notify("error", 'Invalid Amount, decimals must not exceed 2 digits & integers must not exceed 10 digits')};
+        if (DescriptionFlag) {notify("error", 'description cannot exceed 50 characters with no special characters')};
+        if (AccountFlag) {notify("error", 'Choose an account for all your transactions')};
+        // check if credit amount and debit amount are equal
+        if (creditAmount !== debitAmount) {notify("error", 'Debit & Credit amount must be equal')}
     }
 
     const updateDebitTransactionList = async (index, name, value) => {
@@ -80,7 +105,8 @@ export const GeneralJournal = () => {
           data[index] = { ...data[index], ...name };
         } else if (name === 'debitAmount') {
             data[index]['debitTransaction'] = true
-            data[index][name] = parseFloat(value);
+            // data[index][name] = parseFloat(value);
+            data[index][name] = value;
         } else {
           data[index][name] = value;
         }
@@ -95,7 +121,8 @@ export const GeneralJournal = () => {
           data[index] = { ...data[index], ...name };
         } else if (name === 'creditAmount') {
             data[index]['creditTransaction'] = true;
-            data[index][name] = parseFloat(value);
+            // data[index][name] = parseFloat(value);
+            data[index][name] = value;
         }else {
           data[index][name] = value;
         }
@@ -119,10 +146,10 @@ export const GeneralJournal = () => {
     };
 
     const addDebitRow = (e) => {
-        if (debitTransactions.length == 3) {return}
+        if (debitTransactions.length == 3 || creditTransactions.length > 1) {return}
         setDebitTransactions([...debitTransactions, {
             flag: 'N',
-            account: 101,
+            account: 301,
             description: '',
             debitTransaction: false,
             debitAmount: 0
@@ -130,10 +157,10 @@ export const GeneralJournal = () => {
     };
 
     const addCreditRow = (e) => {
-        if (creditTransactions.length == 3) {return}
+        if (creditTransactions.length == 3 || debitTransactions.length > 1) {return}
         setCreditTransactions([...creditTransactions, {
             flag: 'N',
-            account: 101,
+            account: 301,
             description: '',
             creditTransaction: false,
             creditAmount: 0
@@ -294,7 +321,7 @@ export const GeneralJournal = () => {
                         </th>
                         <th>Flag</th>
                         <th>Account</th>
-                        <th>Decription</th>
+                        <th>description</th>
                         <th>Debit</th>
                         </tr>
                     </thead>
@@ -319,7 +346,7 @@ export const GeneralJournal = () => {
                         </th>
                         <th>Flag</th>
                         <th>Account</th>
-                        <th>Decription</th>
+                        <th>description</th>
                         <th>Credit</th>
                         </tr>
                     </thead>

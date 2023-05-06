@@ -11,10 +11,10 @@ const connection = mysql.createConnection({
 function createHeadsTable() {
 
     // Connect to the database
-    connection.connect((err) => {
-        if (err) throw err;
-        console.log('Connected to the MySQL server!');
-    });
+    // connection.connect((err) => {
+    //     if (err) throw err;
+    //     console.log('Connected to the MySQL server!');
+    // });
 
     // Define the query to create the T-Accounts table
     const createTableQuery = `
@@ -41,10 +41,10 @@ function createHeadsTable() {
 function dropAllTables() {
 
     // Connect to the database
-    connection.connect((err) => {
-        if (err) throw err;
-        console.log('Connected to the MySQL server!');
-    });
+    // connection.connect((err) => {
+    //     if (err) throw err;
+    //     console.log('Connected to the MySQL server!');
+    // });
 
     const selectTablesQuery = `
         SELECT table_name
@@ -81,10 +81,10 @@ function dropAllTables() {
 function createGeneralJournalTable() {
 
     // Connect to the database
-    connection.connect((err) => {
-        if (err) throw err;
-        console.log('Connected to the MySQL server!');
-    });
+    // connection.connect((err) => {
+    //     if (err) throw err;
+    //     console.log('Connected to the MySQL server!');
+    // });
 
     // Define the query to create the GeneralJournal table
     const createTableQuery = `
@@ -114,10 +114,10 @@ function createGeneralJournalTable() {
 function createTAcountTable(tableCode, tableName) {
 
     // Connect to the database
-    connection.connect((err) => {
-        if (err) throw err;
-        console.log('Connected to the MySQL server!');
-    });
+    // connection.connect((err) => {
+    //     if (err) throw err;
+    //     console.log('Connected to the MySQL server!');
+    // });
 
         // Define the query to create the T-Accounts table
     const createTableQuery = `
@@ -127,6 +127,7 @@ function createTAcountTable(tableCode, tableName) {
         \`debit\` tinyint(1) DEFAULT NULL,
         \`credit\` tinyint(1) DEFAULT NULL,
         \`amount\` decimal(10,2) DEFAULT NULL,
+        \`description\` char(25) DEFAULT NULL,
         \`flag\` char(1) DEFAULT NULL,
         PRIMARY KEY (\`transactionId\`)
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
