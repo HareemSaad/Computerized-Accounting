@@ -75,14 +75,16 @@ export const GeneralJournal = () => {
         // check for type
         const amountRe = /^\d{1,10}(\.\d{1,2})?$/;
         const descriptionRe = /^[a-zA-Z0-9 ]{0,50}$/;
-        let AmountFlag = false, DescriptionFlag = false, AccountFlag = false;
+        let AmountFlag = false, DescriptionFlag = false, AccountFlag = false, TxnFlag = false;
         let creditAmount = 0, debitAmount = 0;
+        let initialTxnFlag = debitTransactions[0].flag
         for (let index = 0; index < creditTransactions.length; index++) {
             const element = creditTransactions[index];
             !amountRe.test(parseFloat(element.creditAmount)) ? AmountFlag = true : creditAmount += parseFloat(element.creditAmount)
             if (!descriptionRe.test(element.description)) (DescriptionFlag = true)
             if (element.account === "" || element.account === undefined) (AccountFlag = true)
-            if (AmountFlag && DescriptionFlag && AccountFlag) {break}
+            if (element.flag !== initialTxnFlag) (TxnFlag = true)
+            if (AmountFlag && DescriptionFlag && AccountFlag && TxnFlag) {break}
         }
         for (let index = 0; index < debitTransactions.length; index++) {
             const element = debitTransactions[index];
@@ -90,13 +92,17 @@ export const GeneralJournal = () => {
             !amountRe.test(parseFloat(element.debitAmount)) ? AmountFlag = true : debitAmount += parseFloat(element.debitAmount)
             if (!descriptionRe.test(element.description)) (DescriptionFlag = true)
             if (element.account === "" || element.account === undefined) (AccountFlag = true)
-            if (AmountFlag && DescriptionFlag && AccountFlag) {break}
+            if (element.flag !== initialTxnFlag) (TxnFlag = true)
+            if (AmountFlag && DescriptionFlag && AccountFlag && TxnFlag) {break}
         }
         if (AmountFlag) {notify("error", 'Invalid Amount, decimals must not exceed 2 digits & integers must not exceed 10 digits')};
         if (DescriptionFlag) {notify("error", 'description cannot exceed 50 characters with no special characters')};
         if (AccountFlag) {notify("error", 'Choose an account for all your transactions')};
+        if (TxnFlag) {notify("error", 'All transactions must have the same flag')};
         // check if credit amount and debit amount are equal
         if (creditAmount !== debitAmount) {notify("error", 'Debit & Credit amount must be equal')}
+        console.log('ct :: ', creditTransactions);
+        console.log('dt :: ', debitTransactions);
     }
 
     const updateDebitTransactionList = async (index, name, value) => {
