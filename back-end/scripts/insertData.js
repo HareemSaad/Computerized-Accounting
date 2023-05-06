@@ -28,6 +28,31 @@ function insertDatatest(tableCode, debit, credit, amount, description, flag) {
     });
 }
 
+const getlastId = async (table_name) => {
+      
+    // Define the query to fetch all tables
+    let sql = `SELECT * FROM \`${table_name}\` ORDER BY transactionId DESC LIMIT 1`;
+    let response;
+    // Execute the query and return a Promise
+    const queryPromise = new Promise((resolve, reject) => {
+      connection.query(sql, (error, results, fields) => {
+        if (error) {
+          reject(error);
+        } else {
+          response = results;
+          resolve(response);
+        //   console.log(response);
+        }
+      });
+    });
+    
+    // Wait for the query to complete and send the response
+    
+    await queryPromise;
+    console.log("here: ", response[0].transactionId);
+    return response[0].transactionId;   
+}
+
 const insertData = async (req, res) => {
 
     // console.log(req.body);
@@ -57,24 +82,25 @@ const insertData = async (req, res) => {
             const debitInsertQuery = `INSERT INTO \`${debitElement.account}\` (date, debit, credit, amount, description, flag) VALUES ('${date}', 1, 0, ${element.creditAmount}, '${debitElement.description}', '${debitElement.flag}')`;
             console.log(debitInsertQuery);
         
-            // // Execute the INSERT statement with the provided data
-            // connection.query(insertQuery, (error, results, fields) => {
+            // Execute the INSERT statement with the provided data
+            connection.query(insertQuery, (error, results, fields) => {
             
-            //     if (error) throw error;
+                if (error) throw error;
                 
-            //     console.log(`Inserted \${results.affectedRows} row(s)`);
-            // });
+                console.log(`Inserted \${results.affectedRows} row(s)`);
+            });
         
-            // // Execute the INSERT statement with the provided data
-            // connection.query(debitInsertQuery, (error, results, fields) => {
+            // Execute the INSERT statement with the provided data
+            connection.query(debitInsertQuery, (error, results, fields) => {
             
-            //     if (error) throw error;
+                if (error) throw error;
                 
-            //     console.log(`Inserted \${results.affectedRows} row(s)`);
-            // });
+                console.log(`Inserted \${results.affectedRows} row(s)`);
+            });
         }
     } else {
         for (let index = 0; index < debitTransactions.length; index++) {
+            let debitId = 0, creditId = 0
             const element = debitTransactions[index];
             const insertQuery = `INSERT INTO \`${element.account}\` (date, debit, credit, amount, description, flag) VALUES ('${date}', 1, 0, ${element.debitAmount}, '${element.description}', '${element.flag}')`;
             console.log(insertQuery);
@@ -83,38 +109,34 @@ const insertData = async (req, res) => {
             const creditInsertQuery = `INSERT INTO \`${creditElement.account}\` (date, debit, credit, amount, description, flag) VALUES ('${date}', 0, 1, ${element.debitAmount}, '${creditElement.description}', '${creditElement.flag}')`;
             console.log(creditInsertQuery);
         
-            // // Execute the INSERT statement with the provided data
-            // connection.query(insertQuery, (error, results, fields) => {
-            
-            //     if (error) throw error;
+            // Execute the INSERT statement with the provided data
+            connection.query(insertQuery, (error, results, fields) => {
                 
-            //     console.log(`Inserted \${results.affectedRows} row(s)`);
-            // });
+                if (error) throw error;
+                console.log(`Inserted ${results.affectedRows} row(s)`);
+            });
+            debitId = await getlastId(element.account)
         
-            // // Execute the INSERT statement with the provided data
-            // connection.query(debitInsertQuery, (error, results, fields) => {
+            // Execute the INSERT statement with the provided data
+            connection.query(creditInsertQuery, (error, results, fields) => {
             
-            //     if (error) throw error;
-                
-            //     console.log(`Inserted \${results.affectedRows} row(s)`);
-            // });
+                if (error) throw error;
+                console.log(`Inserted ${results.affectedRows} row(s)`);
+            });
+            creditId = await getlastId(creditElement.account);
+            console.log(debitId, creditId);
+            const insertGJQuery = `INSERT INTO \`GeneralJournal\` (creditAccount, debitAccount, debitTransaction, creditTransaction) VALUES (${element.account}, ${creditElement.account}, ${debitId}, ${creditId})`;
+            connection.query(insertGJQuery, (error, results, fields) => {
+                if (error) {
+                  return console.error(error.message);
+                }
+                console.log(results);
+              });
         }
     }
+
+
     
-    // for (let index = 0; index <debitTransactions.length; index++) {
-    //     const debitElement = debitTransactions[index];
-    //     debitElement.debitTransaction = debitElement.debitTransaction ? 1 : 0;
-    //     const insertQuery = `INSERT INTO \`${debitElement.account}\` (date, debit, credit, amount, description, flag) VALUES ('${date}', 0, 1, ${debitElement.debitAmount}, '${debitElement.description}', '${debitElement.flag}')`;
-    //     console.log(insertQuery);
-    
-    //     // Execute the INSERT statement with the provided data
-    //     connection.query(insertQuery, (error, results, fields) => {
-        
-    //         if (error) throw error;
-            
-    //         console.log(`Inserted \${results.affectedRows} row(s)`);
-    //     });
-    // }
 }
 
 

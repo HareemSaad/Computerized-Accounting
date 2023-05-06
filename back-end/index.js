@@ -48,6 +48,7 @@ async function main() {
   // tableCreation.createTAcountTable(300, "Owner Capital")
   // tableCreation.createTAcountTable(400, "Owner Withdrawal")
   // tableCreation.createTAcountTable(100, "Cash")
+  // tableCreation.createTAcountTable(200, "Account Payable")
   // tableCreation.dropAllTables()
   // fetching.fetchTables()
   // insertData.insertData(100, true, false, 100, 'test', 'N');

@@ -161,10 +161,11 @@ function addFkToGj(tableCode) {
 
 function addTableToHeadTable(tableCode, tableName) {
     const sql = `INSERT INTO Heads (tableId, name) VALUES ('${tableCode}', '${tableName}')`;
-    connection.query(sql, (err, result) => {
+    const output = connection.query(sql, (err, result) => {
         if (err) throw err;
         console.log("1 row inserted");
     });
+    console.log(output);
 }
   
 module.exports = {
