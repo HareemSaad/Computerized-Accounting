@@ -8,6 +8,7 @@ const mysql = require('mysql');
 let poolRoutes = require('./routes/routes');
 const tableCreation = require('./scripts/tableCreation.js');
 const fetching = require('./scripts/fetchTables.js');
+const insertData = require('./scripts/insertData.js');
 const port = 3000;
 
 const app = express();
@@ -42,12 +43,15 @@ async function main() {
   });
   
   // DON'T UNCOMMENT THESE
-  // tableCreation.createTAcountTable(301, "Owner Equity")
-  // tableCreation.createTAcountTable(401, "Owner Withdrawal")
   // tableCreation.createHeadsTable()
   // tableCreation.createGeneralJournalTable()
+  // tableCreation.createTAcountTable(300, "Owner Capital")
+  // tableCreation.createTAcountTable(400, "Owner Withdrawal")
+  // tableCreation.createTAcountTable(100, "Cash")
   // tableCreation.dropAllTables()
   // fetching.fetchTables()
+  // insertData.insertData(100, true, false, 100, 'test', 'N');
+
 }
 
 app.use("/", poolRoutes.routes);

@@ -31,10 +31,10 @@ function createHeadsTable() {
         console.log('Heads table created successfully!');
 
         // End the database connection
-        connection.end((err) => {
-            if (err) throw err;
-            console.log('Database connection closed!');
-        });
+        // connection.end((err) => {
+        //     if (err) throw err;
+        //     console.log('Database connection closed!');
+        // });
     })
 }
 
@@ -104,10 +104,10 @@ function createGeneralJournalTable() {
         console.log('GeneralJournal table created successfully!');
 
         // End the database connection
-        connection.end((err) => {
-        if (err) throw err;
-        console.log('Database connection closed!');
-        });
+        // connection.end((err) => {
+        // if (err) throw err;
+        // console.log('Database connection closed!');
+        // });
     });
 }
   
@@ -122,8 +122,8 @@ function createTAcountTable(tableCode, tableName) {
         // Define the query to create the T-Accounts table
     const createTableQuery = `
         CREATE TABLE \`${tableCode}\` (
-        \`transactionId\` int NOT NULL,
-        \`date\` date DEFAULT NULL,
+        \`transactionId\` int NOT NULL AUTO_INCREMENT,
+        \`date\` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
         \`debit\` tinyint(1) DEFAULT NULL,
         \`credit\` tinyint(1) DEFAULT NULL,
         \`amount\` decimal(10,2) DEFAULT NULL,
@@ -141,11 +141,6 @@ function createTAcountTable(tableCode, tableName) {
         addFkToGj(tableCode);
         addTableToHeadTable(tableCode, tableName)
 
-        // End the database connection
-        connection.end((err) => {
-        if (err) throw err;
-        console.log('Database connection closed!');
-        });
     })
 }
 
