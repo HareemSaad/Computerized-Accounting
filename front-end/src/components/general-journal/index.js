@@ -19,23 +19,21 @@ import "react-toastify/dist/ReactToastify.css";
 // }]
 
 export const GeneralJournal = () => {
-    const [debitTransactions, setDebitTransactions] = useState([{ 
-        flag : 'N', 
-        account : "", 
-        description : '', 
+    const [debitTransactions, setDebitTransactions] = useState([{
+        account : "",
         debitTransaction : false,
         debitAmount : 0
     }]);
 
     const [creditTransactions, setCreditTransactions] = useState([{ 
-        flag : 'N', 
         account : "", 
-        description : '',  
         creditTransaction : false,
         creditAmount : 0
     }]);
 
     const [tables, setTables] = useState([]);
+    const [txnFlag, setTxnFlag] = useState('N');
+    const [description, setDescription] = useState('');
 
     useEffect (() => {
         console.log(debitTransactions);
@@ -44,6 +42,14 @@ export const GeneralJournal = () => {
     useEffect (() => {
         console.log(creditTransactions);
     }, [creditTransactions])
+
+    useEffect (() => {
+        console.log(txnFlag);
+    }, [txnFlag])
+
+    useEffect (() => {
+        console.log(description);
+    }, [description])
 
     useEffect(() => {
         const fetchData = async () => {
@@ -77,28 +83,29 @@ export const GeneralJournal = () => {
         const descriptionRe = /^[a-zA-Z0-9 ]{0,50}$/;
         let AmountFlag = false, DescriptionFlag = false, AccountFlag = false, TxnFlag = false;
         let creditAmount = 0, debitAmount = 0;
-        let initialTxnFlag = debitTransactions[0].flag
+        // let initialTxnFlag = debitTransactions[0].flag
+
+        // check for decsription
+        if (!descriptionRe.test(description)) (DescriptionFlag = true)
+
+        //check in credit transactions
         for (let index = 0; index < creditTransactions.length; index++) {
             const element = creditTransactions[index];
             !amountRe.test(parseFloat(element.creditAmount)) ? AmountFlag = true : creditAmount += parseFloat(element.creditAmount)
-            if (!descriptionRe.test(element.description)) (DescriptionFlag = true)
             if (element.account === "" || element.account === undefined) (AccountFlag = true)
-            if (element.flag !== initialTxnFlag) (TxnFlag = true)
-            if (AmountFlag && DescriptionFlag && AccountFlag && TxnFlag) {break}
+            if (AccountFlag && AmountFlag) {break}
         }
         for (let index = 0; index < debitTransactions.length; index++) {
             const element = debitTransactions[index];
             // check amount 
             !amountRe.test(parseFloat(element.debitAmount)) ? AmountFlag = true : debitAmount += parseFloat(element.debitAmount)
-            if (!descriptionRe.test(element.description)) (DescriptionFlag = true)
             if (element.account === "" || element.account === undefined) (AccountFlag = true)
-            if (element.flag !== initialTxnFlag) (TxnFlag = true)
-            if (AmountFlag && DescriptionFlag && AccountFlag && TxnFlag) {break}
+            if (AccountFlag && AmountFlag) {break}
         }
         if (AmountFlag) {notify("error", 'Invalid Amount, decimals must not exceed 2 digits & integers must not exceed 10 digits')};
         if (DescriptionFlag) {notify("error", 'description cannot exceed 50 characters with no special characters')};
         if (AccountFlag) {notify("error", 'Choose an account for all your transactions')};
-        if (TxnFlag) {notify("error", 'All transactions must have the same flag')};
+        // if (TxnFlag) {notify("error", 'All transactions must have the same flag')};
         // check if credit amount and debit amount are equal
         if (creditAmount !== debitAmount) {notify("error", 'Debit & Credit amount must be equal')}
         console.log('ct :: ', creditTransactions);
@@ -106,9 +113,11 @@ export const GeneralJournal = () => {
         // split to separate transactions done at the backend
         console.log("json", JSON.stringify({
             creditTransactions: creditTransactions,
-            debitTransactions: debitTransactions
+            debitTransactions: debitTransactions,
+            description: description,
+            txnFlag: txnFlag
           }));
-        const fetchData = async () => {
+        const sendData = async () => {
             try {
                 const res = await fetch("http://localhost:3000/insertTxns", {
                     method: 'POST',
@@ -117,7 +126,9 @@ export const GeneralJournal = () => {
                     },
                     body: JSON.stringify({
                         creditTransactions: creditTransactions,
-                        debitTransactions: debitTransactions
+                        debitTransactions: debitTransactions,
+                        description: description,
+                        txnFlag: txnFlag
                     })
                 });
 
@@ -129,7 +140,7 @@ export const GeneralJournal = () => {
                 console.log(error);
             }
         };
-        fetchData();
+        sendData();
     }
 
     const updateDebitTransactionList = async (index, name, value) => {
@@ -181,9 +192,7 @@ export const GeneralJournal = () => {
     const addDebitRow = (e) => {
         if (debitTransactions.length == 3 || creditTransactions.length > 1) {return}
         setDebitTransactions([...debitTransactions, {
-            flag: 'N',
             account: 301,
-            description: '',
             debitTransaction: false,
             debitAmount: 0
         }]);
@@ -192,9 +201,7 @@ export const GeneralJournal = () => {
     const addCreditRow = (e) => {
         if (creditTransactions.length == 3 || debitTransactions.length > 1) {return}
         setCreditTransactions([...creditTransactions, {
-            flag: 'N',
             account: 301,
-            description: '',
             creditTransaction: false,
             creditAmount: 0
         }]);
@@ -209,7 +216,7 @@ export const GeneralJournal = () => {
                 onClick={(e) => removeDebitRow(index)}
             ></button>
             </td>
-            <td className="w-25">
+            {/* <td className="w-25">
             <FormControl className="textfield MuiTextField-root mb-3">
                 <Select
                 value={data?.flag}
@@ -224,7 +231,7 @@ export const GeneralJournal = () => {
                 <MenuItem value="N" name='NOR'>Normal</MenuItem>
                 </Select>
             </FormControl>
-            </td>
+            </td> */}
             <td className="w-25">
             <FormControl className="textfield MuiTextField-root mb-3">
                 <Select
@@ -246,7 +253,7 @@ export const GeneralJournal = () => {
                 </Select>
             </FormControl>
             </td>
-            <td>
+            {/* <td>
             <TextField
                 value={data?.description}
                 onChange={(e) => updateDebitTransactionList(index, "description", e.target.value)}
@@ -254,7 +261,7 @@ export const GeneralJournal = () => {
                 variant="standard"
                 required
             />
-            </td>
+            </td> */}
             <td>
             <TextField
                 value={data?.debitAmount}
@@ -277,7 +284,7 @@ export const GeneralJournal = () => {
                 onClick={(e) => removeCreditRow(index)}
             ></button>
             </td>
-            <td className="w-25">
+            {/* <td className="w-25">
             <FormControl className="textfield MuiTextField-root mb-3">
                 <Select
                 value={data?.flag}
@@ -292,7 +299,7 @@ export const GeneralJournal = () => {
                 <MenuItem value="N" name='NOR'>Normal</MenuItem>
                 </Select>
             </FormControl>
-            </td>
+            </td> */}
             <td className="w-25">
             <FormControl className="textfield MuiTextField-root mb-3">
                 <Select
@@ -314,7 +321,7 @@ export const GeneralJournal = () => {
                 </Select>
             </FormControl>
             </td>
-            <td>
+            {/* <td>
             <TextField
                 value={data?.description}
                 onChange={(e) => updateCreditTransactionList(index, "description", e.target.value)}
@@ -322,11 +329,43 @@ export const GeneralJournal = () => {
                 variant="standard"
                 required
             />
-            </td>
+            </td> */}
             <td>
             <TextField
                 value={data?.creditAmount}
                 onChange={(e) => updateCreditTransactionList(index, "creditAmount", e.target.value)}
+                className="textfield"
+                variant="standard"
+                required
+            />
+            </td>
+        </tr>
+        );
+    };
+
+    const general = () => {
+        return (
+        <tr>
+            <td className="w-25">
+            <FormControl className="textfield MuiTextField-root mb-3">
+                <Select
+                value={txnFlag}
+                onChange={(e) => setTxnFlag(e.target.value)}
+                className="textfield"
+                variant="standard"
+                required
+                label="Flag"
+                >
+                <MenuItem value="A" name='ADJ'>Adjustment</MenuItem>
+                <MenuItem value="C" name='CLO'>Closing</MenuItem>
+                <MenuItem value="N" name='NOR'>Normal</MenuItem>
+                </Select>
+            </FormControl>
+            </td>
+            <td>
+            <TextField
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
                 className="textfield"
                 variant="standard"
                 required
@@ -341,6 +380,23 @@ export const GeneralJournal = () => {
             <div className="content">
             <div className="erc20-cont">
                 <div className="erc20-inner-cont">
+                <div className="erc20-">
+                    <table className="table table-bordered">
+                    <thead>
+                        <tr>
+                        <th>Flag</th>
+                        <th>description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {general()}
+                    </tbody>
+                    </table>
+                </div>
+                </div>
+            </div>
+            <div className="erc20-cont">
+                <div className="erc20-inner-cont">
                 {/* <h2 className="erc20-">Create your ERC1155 token</h2> */}
                 <div className="erc20-">
                     <table className="table table-bordered">
@@ -352,9 +408,7 @@ export const GeneralJournal = () => {
                             onClick={addDebitRow}
                             ></button>
                         </th>
-                        <th>Flag</th>
                         <th>Account</th>
-                        <th>description</th>
                         <th>Debit</th>
                         </tr>
                     </thead>
@@ -377,9 +431,7 @@ export const GeneralJournal = () => {
                             onClick={addCreditRow}
                             ></button>
                         </th>
-                        <th>Flag</th>
                         <th>Account</th>
-                        <th>description</th>
                         <th>Credit</th>
                         </tr>
                     </thead>

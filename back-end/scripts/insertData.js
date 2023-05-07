@@ -53,85 +53,104 @@ const getlastId = async (table_name) => {
     return response[0].transactionId;   
 }
 
-const insertData = async (req, res) => {
-
-    // console.log(req.body);
-
-    const {creditTransactions, debitTransactions} = req.body 
-    // console.log(creditTransactions, debitTransactions);
-
-    let date = new Date().toISOString().slice(0, 19).replace('T', ' ');
-
-    /**
-     * const debitTransactions: {
-            flag: string;
-            account: string;
-            description: string;
-            debitTransaction: boolean;
-            debitAmount: number;
-        }[]
-     */
-    if(creditTransactions.length > debitTransactions.length) {
-        for (let index = 0; index < creditTransactions.length; index++) {
-            const element = creditTransactions[index];
-            element.creditTransaction = element.creditTransaction ? 1 : 0;
-            const insertQuery = `INSERT INTO \`${element.account}\` (date, debit, credit, amount, description, flag) VALUES ('${date}', 0, 1, ${element.creditAmount}, '${element.description}', '${element.flag}')`;
-            console.log(insertQuery);
-            //experimental
-            const debitElement = debitTransactions[0];
-            const debitInsertQuery = `INSERT INTO \`${debitElement.account}\` (date, debit, credit, amount, description, flag) VALUES ('${date}', 1, 0, ${element.creditAmount}, '${debitElement.description}', '${debitElement.flag}')`;
-            console.log(debitInsertQuery);
-        
-            // Execute the INSERT statement with the provided data
-            connection.query(insertQuery, (error, results, fields) => {
-            
-                if (error) throw error;
-                
-                console.log(`Inserted \${results.affectedRows} row(s)`);
-            });
-        
-            // Execute the INSERT statement with the provided data
-            connection.query(debitInsertQuery, (error, results, fields) => {
-            
-                if (error) throw error;
-                
-                console.log(`Inserted \${results.affectedRows} row(s)`);
-            });
+const getGjlastId = async () => {
+      
+    // Define the query to fetch all tables
+    let sql = `SELECT * FROM \`GeneralJournal\` ORDER BY transactionId DESC LIMIT 1`;
+    let response;
+    // Execute the query and return a Promise
+    const queryPromise = new Promise((resolve, reject) => {
+      connection.query(sql, (error, results, fields) => {
+        if (error) {
+          reject(error);
+        } else {
+          response = results;
+          resolve(response);
+        //   console.log(response);
         }
+      });
+    });
+    
+    // Wait for the query to complete and send the response
+    
+    await queryPromise;
+    // console.log("here: ", response[0].transactionId);
+    return response[0].transactionId;   
+}
+
+const insertData = async (req, res) => {
+    // console.log('object');
+
+    const {creditTransactions, debitTransactions, description, txnFlag} = req.body 
+    let date = new Date().toISOString().slice(0, 19).replace('T', ' ');
+    console.log(creditTransactions.length , debitTransactions.length);
+
+    if(creditTransactions.length > debitTransactions.length) {
+        // for (let index = 0; index < creditTransactions.length; index++) {
+        //     const element = creditTransactions[index];
+        //     element.creditTransaction = element.creditTransaction ? 1 : 0;
+        //     const insertQuery = `INSERT INTO \`${element.account}\` (date, debit, credit, amount, description, flag) VALUES ('${date}', 0, 1, ${element.creditAmount}, '${element.description}', '${element.flag}')`;
+        //     console.log(insertQuery);
+        //     //experimental
+        //     const debitElement = debitTransactions[0];
+        //     const debitInsertQuery = `INSERT INTO \`${debitElement.account}\` (date, debit, credit, amount, description, flag) VALUES ('${date}', 1, 0, ${element.creditAmount}, '${debitElement.description}', '${debitElement.flag}')`;
+        //     console.log(debitInsertQuery);
+        
+        //     // Execute the INSERT statement with the provided data
+        //     connection.query(insertQuery, (error, results, fields) => {
+            
+        //         if (error) throw error;
+                
+        //         console.log(`Inserted \${results.affectedRows} row(s)`);
+        //     });
+        
+        //     // Execute the INSERT statement with the provided data
+        //     connection.query(debitInsertQuery, (error, results, fields) => {
+            
+        //         if (error) throw error;
+                
+        //         console.log(`Inserted \${results.affectedRows} row(s)`);
+        //     });
+        // }
     } else {
         for (let index = 0; index < debitTransactions.length; index++) {
-            let debitId = 0, creditId = 0
-            const element = debitTransactions[index];
-            const insertQuery = `INSERT INTO \`${element.account}\` (date, debit, credit, amount, description, flag) VALUES ('${date}', 1, 0, ${element.debitAmount}, '${element.description}', '${element.flag}')`;
-            console.log(insertQuery);
-            //experimental
+            
+            const debitElement = debitTransactions[index];
             const creditElement = creditTransactions[0];
-            const creditInsertQuery = `INSERT INTO \`${creditElement.account}\` (date, debit, credit, amount, description, flag) VALUES ('${date}', 0, 1, ${element.debitAmount}, '${creditElement.description}', '${creditElement.flag}')`;
-            console.log(creditInsertQuery);
-        
-            // Execute the INSERT statement with the provided data
-            connection.query(insertQuery, (error, results, fields) => {
+            
+            // log to gj
+            const insertGjQuery = `INSERT INTO \`GeneralJournal\` (date, flag, description, creditAccount, debitAccount, amount) VALUES ('${date}', '${txnFlag}', '${description}', ${creditElement.account}, ${debitElement.account}, ${debitElement.debitAmount})`;
+            connection.query(insertGjQuery, (error, results, fields) => {
+                if (error) {
+                  return console.error(error.message);
+                }
+                console.log(results);
+            });
+            let txnId = await getGjlastId();
+
+            // debit t-acc query
+            const debitInsertQuery = `INSERT INTO \`${debitElement.account}\` (transactionId, debit, credit, amount) VALUES ('${txnId}', 1, 0, ${debitElement.debitAmount})`;
+            // console.log(debitInsertQuery);
+            // credit t-acc query
+            const creditInsertQuery = `INSERT INTO \`${creditElement.account}\` (transactionId, debit, credit, amount) VALUES ('${txnId}', 0, 1, ${debitElement.debitAmount})`;
+            // console.log(creditInsertQuery);
+            
+            // log to debit t-acc
+            connection.query(debitInsertQuery, (error, results, fields) => {
                 
                 if (error) throw error;
                 console.log(`Inserted ${results.affectedRows} row(s)`);
             });
-            debitId = await getlastId(element.account)
         
-            // Execute the INSERT statement with the provided data
+            // log to credit t-acc
             connection.query(creditInsertQuery, (error, results, fields) => {
             
                 if (error) throw error;
                 console.log(`Inserted ${results.affectedRows} row(s)`);
             });
-            creditId = await getlastId(creditElement.account);
-            console.log(debitId, creditId);
-            const insertGJQuery = `INSERT INTO \`GeneralJournal\` (creditAccount, debitAccount, debitTransaction, creditTransaction) VALUES (${element.account}, ${creditElement.account}, ${debitId}, ${creditId})`;
-            connection.query(insertGJQuery, (error, results, fields) => {
-                if (error) {
-                  return console.error(error.message);
-                }
-                console.log(results);
-              });
+            // creditId = await getlastId(creditElement.account);
+            // console.log(debitId, creditId);
+            
         }
     }
 
