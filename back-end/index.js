@@ -9,6 +9,7 @@ let poolRoutes = require('./routes/routes');
 const tableCreation = require('./scripts/tableCreation.js');
 const fetching = require('./scripts/fetchTables.js');
 const insertData = require('./scripts/insertData.js');
+const trialBalance = require('./scripts/trialBalance');
 const port = 3000;
 
 const app = express();
@@ -30,7 +31,8 @@ const connection = mysql.createConnection({
   host: process.env.DB_SERVER,
   user: process.env.DB_USERNAME,
   password: process.env.DB_PASSWORD,
-  database: process.env.DB_NAME
+  database: process.env.DB_NAME,
+  multipleStatements: true,
 });
 
 main().catch(err => console.log(err));
@@ -38,23 +40,32 @@ main().catch(err => console.log(err));
 async function main() {
   // Connect to the database
   connection.connect((err) => {
-    if (err) throw err;
+    // if (err) throw err;
+    if (err) console.log(err);
     console.log('Connected to the MySQL server!');
   });
-  
+
   // DON'T UNCOMMENT THESE
+  // 100s asset - 200s liability - 300 OE - 400 OW - 500s Revenue - 600s Expense
+  // table creation
   // tableCreation.createHeadsTable()
   // tableCreation.createGeneralJournalTable()
   // tableCreation.createTAcountTable(300, "Owner Capital")
   // tableCreation.createTAcountTable(400, "Owner Withdrawal")
+  //Asset
   // tableCreation.createTAcountTable(100, "Cash")
   // tableCreation.createTAcountTable(101, "Supply")
   // tableCreation.createTAcountTable(102, "Land")
+  //Revenue
   // tableCreation.createTAcountTable(500, "Rental Revenue")
-  // tableCreation.createTAcountTable(600, "Rent Expense")
+  //Liability
   // tableCreation.createTAcountTable(200, "Account Payable")
+  //Expense
+  // tableCreation.createTAcountTable(600, "Rent Expense")
   // tableCreation.createTAcountTable(601, "Utility Expense")
+  // tables deletion
   // tableCreation.dropAllTables()
+
   // fetching.fetchTables()
   // insertData.insertData(100, true, false, 100, 'test', 'N');
 

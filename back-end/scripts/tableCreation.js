@@ -66,7 +66,7 @@ function createGeneralJournalTable() {
         \`transactionId\` int NOT NULL AUTO_INCREMENT,
         \`date\` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
         \`flag\` char(1) DEFAULT NULL,
-        \`description\` char(25) DEFAULT NULL,
+        \`description\` char(50) DEFAULT NULL,
         \`creditAccount\` int,
         \`debitAccount\` int,
         \`amount\` decimal(10,2) DEFAULT NULL,
