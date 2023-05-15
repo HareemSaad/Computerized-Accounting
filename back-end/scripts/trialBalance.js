@@ -1,6 +1,6 @@
 const mysql = require('mysql');
 const dotenv = require('dotenv').config()
-const fetchTables = require('./fetchTables');
+// const fetchTables = require('./fetchTables');
 
 
 // establishing connection
@@ -21,14 +21,11 @@ const calculateDebitCredit = (result) => {
 }
 
 
-const allTablesId = async (AllTablesId) => {
-// const allTablesId = async () => {
+const fetchIdDebCredAmount = async (AllTablesId) => {
     // receiving array with all tables Id
     // const AllTablesId = await fetchTables.fetchHeadTablesId();
 
     //variables
-    // var valueMap = new Map();
-    const valueObj = [];
     let response = [];
     let allTablesValue = [];
 
@@ -48,10 +45,14 @@ const allTablesId = async (AllTablesId) => {
                     });
                 });
 
+                // allTablesValue.push(singleTableResult);
                 const singleTableResult = await promise;
-                allTablesValue.push(singleTableResult);
+                allTablesValue.push({
+                    "tableId": item,
+                    "singleTableValues": singleTableResult,
+                });
             });
-
+            
             await Promise.all(promises);
             resolve(allTablesValue);
         }
@@ -59,13 +60,21 @@ const allTablesId = async (AllTablesId) => {
             reject(error);
         }
     });
+    
+    return (queryPromise);
+    
+};
 
-    let allTaccValues = await queryPromise;
-
+const calculateTrialBalance = async (AllTablesId) => {
+    let allTaccValues = await fetchIdDebCredAmount(AllTablesId);
+    const valueObj = [];
+    let calcDebCredAmount;
+    
     allTaccValues.forEach((element, i) => {
-        let calcDebCredAmount = calculateDebitCredit(element);
-
-        //insert values(t-account final calculation) in hashmap
+        calcDebCredAmount = calculateDebitCredit(element.singleTableValues);
+        // calcDebCredAmount = calculateDebitCredit(element);
+        
+        //insert values(t-account final calculation) in object
         if (calcDebCredAmount > 0) {
             valueObj.push({
                 "tableId": AllTablesId[i],
@@ -80,11 +89,13 @@ const allTablesId = async (AllTablesId) => {
             });
         }
     });
-
+    // console.log("valueObj: ", valueObj);
     return valueObj;
-};
+}
 
 
 module.exports = {
-    allTablesId: allTablesId,
+    calculateTrialBalance: calculateTrialBalance,
+    fetchIdDebCredAmount: fetchIdDebCredAmount,
+    calculateDebitCredit: calculateDebitCredit
 };
