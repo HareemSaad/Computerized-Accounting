@@ -21,12 +21,13 @@ const calculateDebitCredit = (result) => {
 }
 
 
-const allTablesId = async () => {
+const allTablesId = async (AllTablesId) => {
+// const allTablesId = async () => {
     // receiving array with all tables Id
-    const AllTablesId = await fetchTables.fetchHeadTablesId();
-    
+    // const AllTablesId = await fetchTables.fetchHeadTablesId();
+
     //variables
-    var valueMap = new Map();
+    // var valueMap = new Map();
     const valueObj = [];
     let response = [];
     let allTablesValue = [];

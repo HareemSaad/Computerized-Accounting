@@ -28,14 +28,23 @@ router.get('/trial-balance', async (req, res) => {
   const q1 = "SELECT tableId, name FROM Heads";
   
   const dataArr = [];
-  const data2 = await trialBalance.allTablesId();
-  dataArr.push(data2);
+  const AllTablesId = [];
+  // const data2 = await trialBalance.allTablesId();
+  // dataArr.push(data2);
   // console.log(data2);
   
-  connection.query(q1, (err, data) => {
+  connection.query(q1, async (err, data) => {
     if (err) console.log(err);
     else {
       dataArr.push(data);
+      data.forEach(element => {
+        AllTablesId.push(element.tableId);
+        // console.log(element.tableId);
+      });
+      const data2 = await trialBalance.allTablesId(AllTablesId);
+      dataArr.push(data2);
+
+      // console.log(data);
       res.send(dataArr);
       console.log("data sent");
     };
