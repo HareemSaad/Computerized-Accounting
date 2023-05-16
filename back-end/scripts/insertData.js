@@ -86,72 +86,99 @@ const insertData = async (req, res) => {
     console.log(creditTransactions.length , debitTransactions.length);
 
     if(creditTransactions.length > debitTransactions.length) {
-        // for (let index = 0; index < creditTransactions.length; index++) {
-        //     const element = creditTransactions[index];
-        //     element.creditTransaction = element.creditTransaction ? 1 : 0;
-        //     const insertQuery = `INSERT INTO \`${element.account}\` (date, debit, credit, amount, description, flag) VALUES ('${date}', 0, 1, ${element.creditAmount}, '${element.description}', '${element.flag}')`;
-        //     console.log(insertQuery);
-        //     //experimental
-        //     const debitElement = debitTransactions[0];
-        //     const debitInsertQuery = `INSERT INTO \`${debitElement.account}\` (date, debit, credit, amount, description, flag) VALUES ('${date}', 1, 0, ${element.creditAmount}, '${debitElement.description}', '${debitElement.flag}')`;
-        //     console.log(debitInsertQuery);
-        
-        //     // Execute the INSERT statement with the provided data
-        //     connection.query(insertQuery, (error, results, fields) => {
-            
-        //         if (error) throw error;
-                
-        //         console.log(`Inserted \${results.affectedRows} row(s)`);
-        //     });
-        
-        //     // Execute the INSERT statement with the provided data
-        //     connection.query(debitInsertQuery, (error, results, fields) => {
-            
-        //         if (error) throw error;
-                
-        //         console.log(`Inserted \${results.affectedRows} row(s)`);
-        //     });
-        // }
-    } else {
-        for (let index = 0; index < debitTransactions.length; index++) {
-            
-            const debitElement = debitTransactions[index];
-            const creditElement = creditTransactions[0];
-            
-            // log to gj
-            const insertGjQuery = `INSERT INTO \`GeneralJournal\` (date, flag, description, creditAccount, debitAccount, amount) VALUES ('${date}', '${txnFlag}', '${description}', ${creditElement.account}, ${debitElement.account}, ${debitElement.debitAmount})`;
-            connection.query(insertGjQuery, (error, results, fields) => {
+      try {
+        for (let index = 0; index < creditTransactions.length; index++) {
+          const debitElement = debitTransactions[0];
+          const creditElement = creditTransactions[index];
+    
+          // log to gj
+          const insertGjQuery = `INSERT INTO \`GeneralJournal\` (date, flag, description, creditAccount, debitAccount, amount) VALUES ('${date}', '${txnFlag}', '${description}', ${creditElement.account}, ${debitElement.account}, ${creditElement.creditAmount})`;
+          connection.query(insertGjQuery, async (error, gjResults, fields) => {
+            if (error) {
+              console.error(error.message);
+              res.status(400).send();
+            } else {
+              console.log(gjResults);
+              let txnId = await getGjlastId();
+    
+              // debit t-acc query
+              const debitInsertQuery = `INSERT INTO \`${debitElement.account}\` (transactionId, debit, credit, amount) VALUES ('${txnId}', 1, 0, ${creditElement.creditAmount})`;
+    
+              // credit t-acc query
+              const creditInsertQuery = `INSERT INTO \`${creditElement.account}\` (transactionId, debit, credit, amount) VALUES ('${txnId}', 0, 1, ${creditElement.creditAmount})`;
+    
+              // log to debit and credit t-acc only if insert into gj is successful
+              connection.query(debitInsertQuery, (error, debitResults, fields) => {
                 if (error) {
-                  return console.error(error.message);
+                  console.error(error.message);
+                  res.status(400).send();
+                } else {
+                  console.log(`Inserted ${debitResults.affectedRows} row(s)`);
+                  connection.query(creditInsertQuery, (error, creditResults, fields) => {
+                    if (error) {
+                      console.error(error.message);
+                      res.status(400).send();
+                    } else {
+                      console.log(`Inserted ${creditResults.affectedRows} row(s)`);
+                      res.status(200).send();
+                    }
+                  });
                 }
-                console.log(results);
-            });
-            let txnId = await getGjlastId();
-
-            // debit t-acc query
-            const debitInsertQuery = `INSERT INTO \`${debitElement.account}\` (transactionId, debit, credit, amount) VALUES ('${txnId}', 1, 0, ${debitElement.debitAmount})`;
-            // console.log(debitInsertQuery);
-            // credit t-acc query
-            const creditInsertQuery = `INSERT INTO \`${creditElement.account}\` (transactionId, debit, credit, amount) VALUES ('${txnId}', 0, 1, ${debitElement.debitAmount})`;
-            // console.log(creditInsertQuery);
-            
-            // log to debit t-acc
-            connection.query(debitInsertQuery, (error, results, fields) => {
-                
-                if (error) throw error;
-                console.log(`Inserted ${results.affectedRows} row(s)`);
-            });
-        
-            // log to credit t-acc
-            connection.query(creditInsertQuery, (error, results, fields) => {
-            
-                if (error) throw error;
-                console.log(`Inserted ${results.affectedRows} row(s)`);
-            });
-            // creditId = await getlastId(creditElement.account);
-            // console.log(debitId, creditId);
-            
+              });
+            }
+          });
         }
+      } catch (error) {
+        console.log(error);
+        res.status(400).send();
+      }
+    } else {
+      try {
+        for (let index = 0; index < debitTransactions.length; index++) {
+          const debitElement = debitTransactions[index];
+          const creditElement = creditTransactions[0];
+    
+          // log to gj
+          const insertGjQuery = `INSERT INTO \`GeneralJournal\` (date, flag, description, creditAccount, debitAccount, amount) VALUES ('${date}', '${txnFlag}', '${description}', ${creditElement.account}, ${debitElement.account}, ${debitElement.debitAmount})`;
+          connection.query(insertGjQuery, async (error, gjResults, fields) => {
+            if (error) {
+              console.error(error.message);
+              res.status(400).send();
+            } else {
+              console.log(gjResults);
+              let txnId = await getGjlastId();
+    
+              // debit t-acc query
+              const debitInsertQuery = `INSERT INTO \`${debitElement.account}\` (transactionId, debit, credit, amount) VALUES ('${txnId}', 1, 0, ${debitElement.debitAmount})`;
+    
+              // credit t-acc query
+              const creditInsertQuery = `INSERT INTO \`${creditElement.account}\` (transactionId, debit, credit, amount) VALUES ('${txnId}', 0, 1, ${debitElement.debitAmount})`;
+    
+              // log to debit and credit t-acc only if insert into gj is successful
+              connection.query(debitInsertQuery, (error, debitResults, fields) => {
+                if (error) {
+                  console.error(error.message);
+                  res.status(400).send();
+                } else {
+                  console.log(`Inserted ${debitResults.affectedRows} row(s)`);
+                  connection.query(creditInsertQuery, (error, creditResults, fields) => {
+                    if (error) {
+                      console.error(error.message);
+                      res.status(400).send();
+                    } else {
+                      console.log(`Inserted ${creditResults.affectedRows} row(s)`);
+                      res.status(200).send();
+                    }
+                  });
+                }
+              });
+            }
+          });
+        }
+      } catch (error) {
+        console.log(error);
+        res.status(400).send();
+      }
     }
 
 

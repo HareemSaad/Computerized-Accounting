@@ -92,6 +92,13 @@ export const FinancialStatement = () => {
                     <thead>
                         <tr>
                             <th>Revenues</th>
+                            <th></th>
+                            <th></th>
+                        </tr>
+                        <tr>
+                            <th>Account Code</th>
+                            <th>Account Title</th>
+                            <th>Amount</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -108,6 +115,13 @@ export const FinancialStatement = () => {
                     <thead>
                         <tr>
                             <th>Expenses</th>
+                            <th></th>
+                            <th></th>
+                        </tr>
+                        <tr>
+                            <th>Account Code</th>
+                            <th>Account Title</th>
+                            <th>Amount</th>
                         </tr>
                     </thead>
                     <tbody>

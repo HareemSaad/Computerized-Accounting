@@ -77,7 +77,13 @@ export const GeneralJournal = () => {
     // }, [tables])
 
     // on submit check if sum debit == sum credit
-    function submit() {
+    function submit(event) {
+        let button = event.target;
+        console.log(button);
+        button.classList.add('disabled');
+        setTimeout(function() {
+        button.classList.remove('disabled');
+        }, 10000); // 10000 milliseconds = 10 seconds
         // check for type
         const amountRe = /^\d{1,10}(\.\d{1,2})?$/;
         const descriptionRe = /^[a-zA-Z0-9 ]{0,50}$/;
@@ -132,10 +138,15 @@ export const GeneralJournal = () => {
                     })
                 });
 
-                const json = await res.json();
+                // const json = await res.json();
                 // const json = JSON.parse(await res.json());
                 // setTables(json);
-                console.log("pop", json);
+                console.log("status :: ", res.status);
+                if (res.status == 200) {
+                    notify("success", "Transactions inserted successfully");
+                } else {
+                    notify("error", "Transactions inserted unsuccessfully");
+                }
             } catch (error) {
                 console.log(error);
             }
@@ -445,7 +456,7 @@ export const GeneralJournal = () => {
             <div className="erc20-cont d-flex gap-2 mt-2">
               <button
                 onClick={submit}
-                className="btn btn-info p-3 text-white w-100"
+                className="btn btn-info p-3 text-white w-100 button"
               >
                 Submit
               </button>
