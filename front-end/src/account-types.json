@@ -1,0 +1,9 @@
+{
+    "assets": 100,
+    "liabilities": 200,
+    "owner-capital": 300,
+    "owner-withdrawal": 400,
+    "revenue": 500,
+    "expense": 600,
+    "contra-assets": 700
+}

@@ -64,7 +64,7 @@ export const TrialBalance = () => {
   return (
     <div className="content">
       <h1>Trial Balance</h1>
-      <div className="erc20-cont">
+      <div className="cont">
         <table className="table table-bordered">
           <thead>
             <tr>

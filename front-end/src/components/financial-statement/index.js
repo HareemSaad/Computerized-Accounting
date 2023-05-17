@@ -87,7 +87,7 @@ export const FinancialStatement = () => {
             <h4>Income Statement</h4>
             {splitVaues()}
             {/* Revenues */}
-            <div className="erc20-cont">
+            <div className="cont">
                 <table className="table table-bordered">
                     <thead>
                         <tr>
@@ -110,7 +110,7 @@ export const FinancialStatement = () => {
                 </table>
             </div>
             {/* Expenses */}
-            <div className="erc20-cont">
+            <div className="cont">
                 <table className="table table-bordered">
                     <thead>
                         <tr>
@@ -136,7 +136,7 @@ export const FinancialStatement = () => {
 
 
             <h3>Owner Equity</h3>
-            <div className="erc20-cont">
+            <div className="cont">
                 <table className="table table-bordered">
                     <tbody>
                         <tr>
@@ -165,7 +165,7 @@ export const FinancialStatement = () => {
 
 
             <h3>Balance Sheet</h3>
-            <div className="erc20-cont">
+            <div className="cont">
                 <table className="table table-bordered">
                     <thead>
                         <tr>

@@ -18,7 +18,7 @@ import "react-toastify/dist/ReactToastify.css";
 //     creditAmount : 0,
 // }]
 
-export const GeneralJournal = () => {
+export const GeneralJournal = (props) => {
     const [debitTransactions, setDebitTransactions] = useState([{
         account : "",
         debitTransaction : false,
@@ -121,7 +121,8 @@ export const GeneralJournal = () => {
             creditTransactions: creditTransactions,
             debitTransactions: debitTransactions,
             description: description,
-            txnFlag: txnFlag
+            txnFlag: txnFlag,
+            accountWeight: props.accountWeight
           }));
         const sendData = async () => {
             try {
@@ -134,7 +135,8 @@ export const GeneralJournal = () => {
                         creditTransactions: creditTransactions,
                         debitTransactions: debitTransactions,
                         description: description,
-                        txnFlag: txnFlag
+                        txnFlag: txnFlag,
+                        accountWeight: props.accountWeight
                     })
                 });
 
@@ -389,9 +391,9 @@ export const GeneralJournal = () => {
     return (
         <>
             <div className="content">
-            <div className="erc20-cont">
-                <div className="erc20-inner-cont">
-                <div className="erc20-">
+            <div className="cont">
+                <div className="inner-cont">
+                <div className="form-body">
                     <table className="table table-bordered">
                     <thead>
                         <tr>
@@ -406,10 +408,9 @@ export const GeneralJournal = () => {
                 </div>
                 </div>
             </div>
-            <div className="erc20-cont">
-                <div className="erc20-inner-cont">
-                {/* <h2 className="erc20-">Create your ERC1155 token</h2> */}
-                <div className="erc20-">
+            <div className="cont">
+                <div className="inner-cont">
+                <div className="form-body">
                     <table className="table table-bordered">
                     <thead>
                         <tr>
@@ -430,9 +431,9 @@ export const GeneralJournal = () => {
                 </div>
                 </div>
             </div>
-            <div className="erc20-cont">
-                <div className="erc20-inner-cont">
-                <div className="erc20-">
+            <div className="cont">
+                <div className="inner-cont">
+                <div className="form-body">
                     <table className="table table-bordered">
                     <thead>
                         <tr>
@@ -453,7 +454,7 @@ export const GeneralJournal = () => {
                 </div>
                 </div>
             </div>
-            <div className="erc20-cont d-flex gap-2 mt-2">
+            <div className="cont d-flex gap-2 mt-2">
               <button
                 onClick={submit}
                 className="btn btn-info p-3 text-white w-100 button"

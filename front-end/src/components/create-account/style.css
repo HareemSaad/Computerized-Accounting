@@ -1,0 +1,180 @@
+  .content .MuiInput-underline:before {
+    border-bottom: 1px solid #00aedc;
+  }
+
+  .content .MuiInput-underline:after {
+    border-bottom: 1px solid #00aedc;
+  }
+
+  .content .MuiInput-underline:hover:not(.Mui-disabled):before {
+    border-bottom: 1px solid #767884;
+  }
+
+  .content .MuiFormLabel-root.Mui-focused,
+  .content .MuiInputLabel-shrink {
+    color: #00aedc;
+  }
+
+  .form-wrapper .content li a {
+    font-family: "Montserrat", sans-serif;
+    font-size: 1.27em;
+    text-decoration: none;
+    color: #5f6060;
+    display: flex;
+    gap: 1em;
+    align-items: center;
+  }
+
+  .form-wrapper .content .list-group li {
+    border: 0px;
+    margin: 15px 0;
+    text-align: left;
+    transition: background 0.5s ease-in;
+  }
+
+  .form-wrapper .content .list-img {
+    width: 20%;
+    text-align: center;
+  }
+
+  .form-wrapper .content .list-desc {
+    width: 75%;
+    font-family: "Montserrat", sans-serif;
+  }
+
+  .form-wrapper .content .list-group li:hover .arrow {
+    color: #fff;
+  }
+
+  .form-wrapper .content .arrow {
+    width: 2%;
+    color: #919191;
+    font-size: 4em;
+    font-weight: 200;
+    font-style: normal;
+    transition: 0.9s;
+  }
+
+  .form-wrapper .content .arrow:before {
+    content: ">";
+  }
+
+  .content .MuiFormControl-root.MuiTextField-root {
+    width: 100%;
+  }
+
+  .cont {
+    margin: 2em 0 2em 0;
+  }
+
+  @media (max-width: 1024px) {
+    .form-wrapper .steps {
+      overflow-x: auto;
+    }
+
+    .form-wrapper .steps li a {
+      font-size: 1em;
+    }
+
+    .form-wrapper .content .list-img img {
+      width: 100%;
+    }
+
+    .form-wrapper .form-card .form-header {
+      font-size: 0.8em;
+      padding: 10px 0;
+    }
+
+    .form-wrapper .form-card .form-header img {
+      width: 100%;
+    }
+  }
+
+  @media (max-width: 800px) {
+    .wrapper {
+      flex-direction: column;
+    }
+
+    .checkbox-group {
+      flex-direction: column;
+    }
+
+    .checkbox-box>label {
+      width: 50%;
+    }
+
+    .form-wrapper {
+      width: 100%;
+    }
+
+    .form-wrapper .content>img {
+      width: 100%;
+    }
+
+    .form-wrapper .form-card {
+      width: 100%;
+    }
+
+    .form-wrapper .form-card .form-header h1 {
+      font-size: 1em;
+      font-weight: bold;
+      margin: 0;
+    }
+
+    .form-wrapper .form-card .form-header h1 img {
+      width: 20%;
+    }
+
+    .form-wrapper .content {
+      padding: 1em 1em 2em 1em;
+    }
+
+    .form-wrapper .steps li {
+      width: auto;
+      padding-left: 2%;
+      padding-right: 2%;
+      white-space: nowrap;
+    }
+
+    .form-wrapper .steps li a {
+      font-size: 0.7em;
+      padding: 10px;
+    }
+
+    .card-list li {
+      width: 40%;
+    }
+
+    .card-list li img {
+      width: 40%;
+    }
+
+    .makeStyles-paper-2 {
+      width: 95% !important;
+      left: 45% !important;
+    }
+  }
+
+  .w-25 {
+    width: 100%;
+  }
+
+  .content {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    height: 100vh;
+    width: 100%;
+  }
+
+  .create-account-body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    height: 100vh;
+    width: 100%;
+  }
+
+  

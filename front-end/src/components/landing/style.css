@@ -21,7 +21,7 @@ body{
   }
   
   .card {
-    margin: 0 0 3rem;
+    margin: 0 2rem 3rem;
     padding: 0 1rem 1rem 1rem;
     min-height: 170px;
     width: 300px;
@@ -47,4 +47,8 @@ body{
     background-color: #0D003F;
     color: white;
     font-weight: bold;
+  }
+
+  .landing-heading {
+    margin: 0 0 2rem 0;
   }

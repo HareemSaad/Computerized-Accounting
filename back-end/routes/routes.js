@@ -1,6 +1,7 @@
 const express = require('express');
 const {fetchTables} = require('./../scripts/fetchTables');
 const {insertData} = require('./../scripts/insertData');
+const {createAccount} = require('./../scripts/createAccount');
 const cors = require('cors');
 const trialBalance = require('./../scripts/trialBalance.js');
 const financialStatement = require('./../scripts/financialStatement');
@@ -22,6 +23,7 @@ router.use(cors());
 
 router.post("/fetchTables", fetchTables);
 router.post("/insertTxns", insertData);
+router.post("/createAccount", createAccount);
 
 // TRIAL BALANCE GET METHOD
 router.get('/trial-balance', async (req, res) => {
