@@ -22,13 +22,13 @@ function App() {
   })
 
   const [accountWeight, setAccountWeight] = useState({
-    "assets": 'debit',
-    "liabilities": 'credit',
-    "owner-capital": 'credit',
-    "owner-withdrawal": 'debit',
-    "revenue": 'credit',
-    "expense": 'debit',
-    "contra-assets": 'credit'
+    "100": 'debit',
+    "200": 'credit',
+    "300": 'credit',
+    "400": 'debit',
+    "500": 'credit',
+    "600": 'debit',
+    "700": 'credit'
   })
 
   return (

@@ -1,5 +1,6 @@
 const mysql = require('mysql');
 const dotenv = require('dotenv').config()
+const trialBalance = require('./../scripts/trialBalance.js');
 
 const connection = mysql.createConnection({
     host: process.env.DB_SERVER,
@@ -79,149 +80,285 @@ const getGjlastId = async () => {
 }
 
 const insertData = async (req, res) => {
-    // console.log('object');
 
-    const {creditTransactions, debitTransactions, description, txnFlag, accountWeight} = req.body 
+    /**
+     * tableIds - array of all the tables involved
+     * accountWeight - json object from app.js signifies which account type is written in debit and which in credit
+     */
+    const {creditTransactions, debitTransactions, description, txnFlag, accountWeight, tableIds} = req.body 
     let date = new Date().toISOString().slice(0, 19).replace('T', ' ');
 
-    // get heads table instance
-    for (let index = 0; index < creditTransactions.length; index++) {
-      const getLastClosingDate = `SELECT * FROM \`Heads\` WHERE tableId = ${creditTransactions[index].account};`
-      connection.query(getLastClosingDate, (error, getLastClosingDate, fields) => {
-        if (error) {
-          console.error(error.message);
-          res.status(400).send();
-        }
-        else {
-            // console.error(getLastClosingDate);
-            closingDate = getLastClosingDate[0].startFrom;
-            console.log(closingDate);
-            closingDate = `${closingDate.getFullYear()}-${closingDate.getMonth() + 1}-${closingDate.getDate()}`
-            console.log(closingDate);
-            try {
-              const getBalanceQuery = `SELECT * FROM \`GeneralJournal\` WHERE DATE(date) >= ${closingDate} AND creditAccount = ${creditTransactions[index].account};`;
-              console.log(getBalanceQuery);
-                    connection.query(getBalanceQuery, async (error, getBalanceQueryResult, fields) => {
-                      if (error) {
-                        console.error(error.message);
-                        res.status(400).send();
-                      } else {
-                        console.log(getBalanceQueryResult);
-                        res.status(200).send();
-                      }
-                    });
-            } catch (error) {
-                console.log(error);
-                res.status(400).send();
+    console.log(tableIds);
+    try {
+      // get trial balance for each table to get there cummulative debit / credit
+      let data;
+      const getTrialBalance = async () => {
+        data = await trialBalance.calculateTrialBalance(tableIds);
+      }
+      // when you get the trial balance then
+      getTrialBalance().then(async() => {
+        console.log('data', data);
+        // check if credit transactions > debit txns
+        if(creditTransactions.length > debitTransactions.length) {
+          try {
+            // if yes, iterate through the credit transactions - debit remains constant
+            // d <-> c1 | d <-> c2 ....
+            for (let index = 0; index < creditTransactions.length; index++) {
+              const debitElement = debitTransactions[0];
+              const creditElement = creditTransactions[index];
+
+              // get their head type i.e a table with code 523 belongs to the "revenue": 500 account
+              // 523 -> 5 * 100 -> 500
+              const debitHeadType = Number(String(debitElement.account)[0]) * 100;
+              const creditHeadType = Number(String(creditElement.account)[0]) * 100;
+
+              // merchandising / invertory management
+              // check if t-account will be balanced after the new entry
+              console.log('data', data);
+              let goAhead = ifOverflow(
+                debitHeadType, 
+                creditHeadType, 
+                creditElement.account, 
+                debitElement.account, 
+                creditElement.creditAmount, 
+                accountWeight, 
+                data
+              );
+
+              // if yes insert to GJ
+              if (goAhead) {
+                // log to gj
+                const status = await insertToGJWithTwoCreditTransactions (
+                  date, 
+                  txnFlag, 
+                  description, 
+                  creditElement.account, 
+                  debitElement.account, 
+                  creditElement.creditAmount
+                )
+                if (!status) {
+                  console.log("from backend - GJWithTwoCredit :: ", status);
+                  res.status(400).send(); // if fail
+                }
+                res.status(200).send(); // if success
+              } else {
+                // else fail
+                res.status(401).send();
+              }
             }
+          } catch (error) {
+            console.log(error);
+            res.status(400).send();
+          }
+        } else {
+          try {
+            // if no, iterate through the debit transactions - credit remains constant
+            // c <-> d1 | c <-> d2 ....
+            for (let index = 0; index < debitTransactions.length; index++) {
+              const debitElement = debitTransactions[index];
+              const creditElement = creditTransactions[0];
+
+              // get their head type i.e a table with code 523 belongs to the "revenue": 500 account
+              // 523 -> 5 * 100 -> 500 
+              const debitHeadType = Number(String(debitElement.account)[0]) * 100;
+              const creditHeadType = Number(String(creditElement.account)[0]) * 100;
+
+              // merchandising / invertory management
+              // check if t-account will be balanced after the new entry
+              console.log('data', data);
+              let goAhead = ifOverflow(
+                debitHeadType, 
+                creditHeadType, 
+                creditElement.account, 
+                debitElement.account, 
+                debitElement.debitAmount, 
+                accountWeight, 
+                data
+              );
+
+              // if yes insert to GJ
+              if (goAhead) {
+                // log to gj
+                const status = await insertToGJWithTwoDebitTransactions (
+                  date, 
+                  txnFlag, 
+                  description, 
+                  creditElement.account, 
+                  debitElement.account, 
+                  debitElement.debitAmount
+                )
+                if (!status) {
+                  console.log("from backend - GJWithTwoDebit :: ", status);
+                  res.status(400).send(); // if fail
+                }
+                res.status(200).send(); // if success
+              } else {
+                res.status(401).send(); // if fail
+              }
+              
+            }
+          } catch (error) {
+            console.log(error);
+            res.status(400).send();
+          }
         }
-      })
+      });
+    } catch (error) {
+      res.status(400).send(error)
     }
-    // console.log(accountWeight);
-
-
-    console.log(creditTransactions.length , debitTransactions.length);
-
-    // if(creditTransactions.length > debitTransactions.length) {
-    //   try {
-    //     for (let index = 0; index < creditTransactions.length; index++) {
-    //       const debitElement = debitTransactions[0];
-    //       const creditElement = creditTransactions[index];
-    
-    //       // log to gj
-    //       const insertGjQuery = `INSERT INTO \`GeneralJournal\` (date, flag, description, creditAccount, debitAccount, amount) VALUES ('${date}', '${txnFlag}', '${description}', ${creditElement.account}, ${debitElement.account}, ${creditElement.creditAmount})`;
-    //       connection.query(insertGjQuery, async (error, gjResults, fields) => {
-    //         if (error) {
-    //           console.error(error.message);
-    //           res.status(400).send();
-    //         } else {
-    //           console.log(gjResults);
-    //           let txnId = await getGjlastId();
-    
-    //           // debit t-acc query
-    //           const debitInsertQuery = `INSERT INTO \`${debitElement.account}\` (transactionId, debit, credit, amount) VALUES ('${txnId}', 1, 0, ${creditElement.creditAmount})`;
-    
-    //           // credit t-acc query
-    //           const creditInsertQuery = `INSERT INTO \`${creditElement.account}\` (transactionId, debit, credit, amount) VALUES ('${txnId}', 0, 1, ${creditElement.creditAmount})`;
-    
-    //           // log to debit and credit t-acc only if insert into gj is successful
-    //           connection.query(debitInsertQuery, (error, debitResults, fields) => {
-    //             if (error) {
-    //               console.error(error.message);
-    //               res.status(400).send();
-    //             } else {
-    //               console.log(`Inserted ${debitResults.affectedRows} row(s)`);
-    //               connection.query(creditInsertQuery, (error, creditResults, fields) => {
-    //                 if (error) {
-    //                   console.error(error.message);
-    //                   res.status(400).send();
-    //                 } else {
-    //                   console.log(`Inserted ${creditResults.affectedRows} row(s)`);
-    //                   res.status(200).send();
-    //                 }
-    //               });
-    //             }
-    //           });
-    //         }
-    //       });
-    //     }
-    //   } catch (error) {
-    //     console.log(error);
-    //     res.status(400).send();
-    //   }
-    // } else {
-    //   try {
-    //     for (let index = 0; index < debitTransactions.length; index++) {
-    //       const debitElement = debitTransactions[index];
-    //       const creditElement = creditTransactions[0];
-    
-    //       // log to gj
-    //       const insertGjQuery = `INSERT INTO \`GeneralJournal\` (date, flag, description, creditAccount, debitAccount, amount) VALUES ('${date}', '${txnFlag}', '${description}', ${creditElement.account}, ${debitElement.account}, ${debitElement.debitAmount})`;
-    //       connection.query(insertGjQuery, async (error, gjResults, fields) => {
-    //         if (error) {
-    //           console.error(error.message);
-    //           res.status(400).send();
-    //         } else {
-    //           console.log(gjResults);
-    //           let txnId = await getGjlastId();
-    
-    //           // debit t-acc query
-    //           const debitInsertQuery = `INSERT INTO \`${debitElement.account}\` (transactionId, debit, credit, amount) VALUES ('${txnId}', 1, 0, ${debitElement.debitAmount})`;
-    
-    //           // credit t-acc query
-    //           const creditInsertQuery = `INSERT INTO \`${creditElement.account}\` (transactionId, debit, credit, amount) VALUES ('${txnId}', 0, 1, ${debitElement.debitAmount})`;
-    
-    //           // log to debit and credit t-acc only if insert into gj is successful
-    //           connection.query(debitInsertQuery, (error, debitResults, fields) => {
-    //             if (error) {
-    //               console.error(error.message);
-    //               res.status(400).send();
-    //             } else {
-    //               console.log(`Inserted ${debitResults.affectedRows} row(s)`);
-    //               connection.query(creditInsertQuery, (error, creditResults, fields) => {
-    //                 if (error) {
-    //                   console.error(error.message);
-    //                   res.status(400).send();
-    //                 } else {
-    //                   console.log(`Inserted ${creditResults.affectedRows} row(s)`);
-    //                   res.status(200).send();
-    //                 }
-    //               });
-    //             }
-    //           });
-    //         }
-    //       });
-    //     }
-    //   } catch (error) {
-    //     console.log(error);
-    //     res.status(400).send();
-    //   }
-    // }
-
-
-    
 }
 
+
+/**
+ * 
+ * @param {*} date 
+ * @param {*} txnFlag 
+ * @param {*} description 
+ * @param {*} creditElementAccount credit account (table) name (code)
+ * @param {*} debitElementAccount debit account (table) name (code)
+ * @param {*} amount 
+ * @returns txn success true or false
+ * 
+ * inserts to GJ if succes inserts to T-Account
+ */
+const insertToGJWithTwoCreditTransactions = async (date, txnFlag, description, creditElementAccount, debitElementAccount, amount) => {
+  const insertGjQuery = `INSERT INTO \`GeneralJournal\` (date, flag, description, creditAccount, debitAccount, amount) VALUES ('${date}', '${txnFlag}', '${description}', ${creditElementAccount}, ${debitElementAccount}, ${amount})`;
+  connection.query(insertGjQuery, async (error, gjResults, fields) => {
+    if (error) {
+      console.error(error.message);
+      return false
+    } else {
+      console.log(gjResults);
+      let txnId = await getGjlastId();
+
+      // debit t-acc query
+      const debitInsertQuery = `INSERT INTO \`${debitElementAccount}\` (transactionId, debit, credit, amount) VALUES ('${txnId}', 1, 0, ${amount})`;
+
+      // credit t-acc query
+      const creditInsertQuery = `INSERT INTO \`${creditElementAccount}\` (transactionId, debit, credit, amount) VALUES ('${txnId}', 0, 1, ${amount})`;
+
+      // log to debit and credit t-acc only if insert into gj is successful
+      connection.query(debitInsertQuery, (error, debitResults, fields) => {
+        if (error) {
+          console.error(error.message);
+          return false
+        } else {
+          console.log(`Inserted ${debitResults.affectedRows} row(s)`);
+          connection.query(creditInsertQuery, (error, creditResults, fields) => {
+            if (error) {
+              console.error(error.message);
+              return false
+            } else {
+              console.log(`Inserted ${creditResults.affectedRows} row(s)`);
+              return true
+            }
+          });
+        }
+      });
+    }
+  });
+  return true
+}
+
+/**
+ * 
+ * @param {*} date 
+ * @param {*} txnFlag 
+ * @param {*} description 
+ * @param {*} creditElementAccount credit account (table) name (code)
+ * @param {*} debitElementAccount debit account (table) name (code)
+ * @param {*} amount 
+ * @returns txn success true or false
+ * 
+ * inserts to GJ if succes inserts to T-Account
+ */
+const insertToGJWithTwoDebitTransactions = async (date, txnFlag, description, creditElementAccount, debitElementAccount, amount) => {
+  const insertGjQuery = `INSERT INTO \`GeneralJournal\` (date, flag, description, creditAccount, debitAccount, amount) VALUES ('${date}', '${txnFlag}', '${description}', ${creditElementAccount}, ${debitElementAccount}, ${amount})`;
+  connection.query(insertGjQuery, async (error, gjResults, fields) => {
+    if (error) {
+      console.error(error.message);
+      return false
+    } else {
+      console.log(gjResults);
+      let txnId = await getGjlastId();
+
+      // debit t-acc query
+      const debitInsertQuery = `INSERT INTO \`${debitElementAccount}\` (transactionId, debit, credit, amount) VALUES ('${txnId}', 1, 0, ${amount})`;
+
+      // credit t-acc query
+      const creditInsertQuery = `INSERT INTO \`${creditElementAccount}\` (transactionId, debit, credit, amount) VALUES ('${txnId}', 0, 1, ${amount})`;
+
+      // log to debit and credit t-acc only if insert into gj is successful
+      connection.query(debitInsertQuery, (error, debitResults, fields) => {
+        if (error) {
+          console.error(error.message);
+          return false
+        } else {
+          console.log(`Inserted ${debitResults.affectedRows} row(s)`);
+          connection.query(creditInsertQuery, (error, creditResults, fields) => {
+            if (error) {
+              console.error(error.message);
+              return false
+            } else {
+              console.log(`Inserted ${creditResults.affectedRows} row(s)`);
+              return true
+            }
+          });
+        }
+      });
+    }
+  });
+  return true
+}
+
+/**
+ * 
+ * @param {*} tableId 
+ * @param {*} data json from trial balance 
+ * @returns json with a table's cummulative debit / credit
+ */
+function getDebitAndCredit(tableId, data) {
+  // console.log("from getDebitAndCredit data :: ", data);
+  const result = data.find(item => item.tableId === tableId);
+  if (result) {
+    return { debit: result.debit, credit: result.credit };
+  } else {
+    return null;
+  }
+}
+
+/**
+ * 
+ * @param {*} debitHeadType account type of table in debit transaction
+ * @param {*} creditHeadType account type of table in credit transaction
+ * @param {*} creditElementAccount table in credit transaction
+ * @param {*} debitElementAccount table in debit transaction
+ * @param {*} amount 
+ * @param {*} accountWeight json of account weight from App.js (from req.body)
+ * @param {*} data json from trial balance
+ * @returns true if overflows false if it doen't
+ */
+function ifOverflow(debitHeadType, creditHeadType, creditElementAccount, debitElementAccount, amount, accountWeight, data) {
+  // console.log("from overflow data :: ", data);
+  // if an account in debit txn has net sum of t-acc in debit no check necessary
+  // as we are adding the value
+  // if an account in debit txn has net sum of t-acc in credit check necessary
+  // as we are subtracting credit from cummulative debit (not enough balance issues
+  // cash with debit of 5000 cannot credit 5001
+  if (accountWeight[debitHeadType] === 'credit') {
+    const obj = getDebitAndCredit(debitElementAccount, data)
+    if (parseFloat(amount) > parseFloat(obj.credit)) {
+      return false
+    }
+  } 
+  if (accountWeight[creditHeadType] === 'debit') {
+    const obj = getDebitAndCredit(creditElementAccount, data)
+    if (parseFloat(amount) > parseFloat(obj.debit)) {
+      return false
+    }
+  }
+  return true;
+}
 
 module.exports = {
     insertData: insertData

@@ -71,6 +71,10 @@ export const GeneralJournal = (props) => {
         fetchData();
     }, []);
 
+    function hasDuplicates(array) {
+        return array.length !== new Set(array).size;
+    }
+
     // useEffect (() => {
     //     console.log("tables :: ", tables);
     //     console.log(typeof(tables));
@@ -84,12 +88,29 @@ export const GeneralJournal = (props) => {
         setTimeout(function() {
         button.classList.remove('disabled');
         }, 10000); // 10000 milliseconds = 10 seconds
+
+        let tableIds = []
+        creditTransactions.forEach(element => {
+            tableIds.push(element.account)
+        });
+        debitTransactions.forEach(element => {
+            tableIds.push(element.account)
+        });
+
+        console.log("table ids from front-end :: ", tableIds);
+
         // check for type
         const amountRe = /^\d{1,10}(\.\d{1,2})?$/;
         const descriptionRe = /^[a-zA-Z0-9 ]{0,50}$/;
-        let AmountFlag = false, DescriptionFlag = false, AccountFlag = false, TxnFlag = false;
+        let AmountFlag = false, DescriptionFlag = false, AccountFlag = false, duplicateFlag = false;
         let creditAmount = 0, debitAmount = 0;
         // let initialTxnFlag = debitTransactions[0].flag
+
+        // check if same account is used in any transaction
+        if (hasDuplicates(tableIds)) {
+            duplicateFlag = true;
+            notify("error", "duplicate accounts")
+        }
 
         // check for decsription
         if (!descriptionRe.test(description)) (DescriptionFlag = true)
@@ -136,7 +157,8 @@ export const GeneralJournal = (props) => {
                         debitTransactions: debitTransactions,
                         description: description,
                         txnFlag: txnFlag,
-                        accountWeight: props.accountWeight
+                        accountWeight: props.accountWeight,
+                        tableIds: tableIds
                     })
                 });
 
@@ -146,6 +168,8 @@ export const GeneralJournal = (props) => {
                 console.log("status :: ", res.status);
                 if (res.status == 200) {
                     notify("success", "Transactions inserted successfully");
+                } else if (res.status == 401) {
+                    notify("error", "Account Overflow");
                 } else {
                     notify("error", "Transactions inserted unsuccessfully");
                 }
@@ -153,7 +177,11 @@ export const GeneralJournal = (props) => {
                 console.log(error);
             }
         };
-        sendData();
+        if (AmountFlag || AccountFlag || DescriptionFlag || (creditAmount !== debitAmount) || duplicateFlag) {
+            notify("error", 'Unable to send transactions due to errors')
+        } else {
+            sendData();
+        }
     }
 
     const updateDebitTransactionList = async (index, name, value) => {
@@ -229,22 +257,6 @@ export const GeneralJournal = (props) => {
                 onClick={(e) => removeDebitRow(index)}
             ></button>
             </td>
-            {/* <td className="w-25">
-            <FormControl className="textfield MuiTextField-root mb-3">
-                <Select
-                value={data?.flag}
-                onChange={(e) => updateDebitTransactionList(index, "flag", e.target.value)}
-                className="textfield"
-                variant="standard"
-                required
-                label="Flag"
-                >
-                <MenuItem value="A" name='ADJ'>Adjustment</MenuItem>
-                <MenuItem value="C" name='CLO'>Closing</MenuItem>
-                <MenuItem value="N" name='NOR'>Normal</MenuItem>
-                </Select>
-            </FormControl>
-            </td> */}
             <td className="w-25">
             <FormControl className="textfield MuiTextField-root mb-3">
                 <Select
@@ -255,9 +267,6 @@ export const GeneralJournal = (props) => {
                 required
                 label="Account"
                 >
-                {/* <MenuItem value="101" name='101'>101</MenuItem>
-                <MenuItem value="102" name='102'>102</MenuItem>
-                <MenuItem value="103" name='103'>103</MenuItem> */}
                 {
                     Object.values(tables).map(({ tableId, name }) => (
                         <MenuItem key={tableId} value={tableId} name={tableId}>{`${tableId} - ${name}`}</MenuItem>
@@ -266,15 +275,6 @@ export const GeneralJournal = (props) => {
                 </Select>
             </FormControl>
             </td>
-            {/* <td>
-            <TextField
-                value={data?.description}
-                onChange={(e) => updateDebitTransactionList(index, "description", e.target.value)}
-                className="textfield"
-                variant="standard"
-                required
-            />
-            </td> */}
             <td>
             <TextField
                 value={data?.debitAmount}
@@ -297,22 +297,6 @@ export const GeneralJournal = (props) => {
                 onClick={(e) => removeCreditRow(index)}
             ></button>
             </td>
-            {/* <td className="w-25">
-            <FormControl className="textfield MuiTextField-root mb-3">
-                <Select
-                value={data?.flag}
-                onChange={(e) => updateCreditTransactionList(index, "flag", e.target.value)}
-                className="textfield"
-                variant="standard"
-                required
-                label="Flag"
-                >
-                <MenuItem value="A" name='ADJ'>Adjustment</MenuItem>
-                <MenuItem value="C" name='CLO'>Closing</MenuItem>
-                <MenuItem value="N" name='NOR'>Normal</MenuItem>
-                </Select>
-            </FormControl>
-            </td> */}
             <td className="w-25">
             <FormControl className="textfield MuiTextField-root mb-3">
                 <Select
@@ -334,15 +318,6 @@ export const GeneralJournal = (props) => {
                 </Select>
             </FormControl>
             </td>
-            {/* <td>
-            <TextField
-                value={data?.description}
-                onChange={(e) => updateCreditTransactionList(index, "description", e.target.value)}
-                className="textfield"
-                variant="standard"
-                required
-            />
-            </td> */}
             <td>
             <TextField
                 value={data?.creditAmount}
@@ -391,86 +366,80 @@ export const GeneralJournal = (props) => {
     return (
         <>
             <div className="content">
-            <div className="cont">
-                <div className="inner-cont">
-                <div className="form-body">
-                    <table className="table table-bordered">
-                    <thead>
-                        <tr>
-                        <th>Flag</th>
-                        <th>description</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {general()}
-                    </tbody>
-                    </table>
+                <div className="cont">
+                    <div className="inner-cont">
+                    <div className="form-body">
+                        <table className="table table-bordered">
+                        <thead>
+                            <tr>
+                            <th>Flag</th>
+                            <th>description</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {general()}
+                        </tbody>
+                        </table>
+                    </div>
+                    </div>
                 </div>
+                <div className="transaction-body">
+                    <div className="cont side-margin">
+                        <div className="inner-cont">
+                        <div className="form-body">
+                            <table className="table table-bordered">
+                            <thead>
+                                <tr>
+                                <th>
+                                    <button
+                                    className="btn text-success fa fa-plus-circle"
+                                    onClick={addDebitRow}
+                                    ></button>
+                                </th>
+                                <th>Account</th>
+                                <th>Debit</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {debitTransactions.map((item, index) => {return debitTokenRow(item, index);})}
+                            </tbody>
+                            </table>
+                        </div>
+                        </div>
+                    </div>
+                    <div className="cont">
+                        <div className="inner-cont">
+                        <div className="form-body">
+                            <table className="table table-bordered">
+                            <thead>
+                                <tr>
+                                <th>
+                                    <button
+                                    className="btn text-success fa fa-plus-circle"
+                                    onClick={addCreditRow}
+                                    ></button>
+                                </th>
+                                <th>Account</th>
+                                <th>Credit</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {creditTransactions.map((item, index) => {return creditTokenRow(item, index);})}
+                            </tbody>
+                            </table>
+                        </div>
+                        </div>
+                    </div>
+                </div>
+                <div className="cont d-flex gap-2 mt-2">
+                <button
+                    onClick={submit}
+                    className="btn btn-info p-3 text-white w-100 button"
+                >
+                    Submit
+                </button>
                 </div>
             </div>
-            <div className="cont">
-                <div className="inner-cont">
-                <div className="form-body">
-                    <table className="table table-bordered">
-                    <thead>
-                        <tr>
-                        <th>
-                            <button
-                            className="btn text-success fa fa-plus-circle"
-                            onClick={addDebitRow}
-                            ></button>
-                        </th>
-                        <th>Account</th>
-                        <th>Debit</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {debitTransactions.map((item, index) => {return debitTokenRow(item, index);})}
-                    </tbody>
-                    </table>
-                </div>
-                </div>
-            </div>
-            <div className="cont">
-                <div className="inner-cont">
-                <div className="form-body">
-                    <table className="table table-bordered">
-                    <thead>
-                        <tr>
-                        <th>
-                            <button
-                            className="btn text-success fa fa-plus-circle"
-                            onClick={addCreditRow}
-                            ></button>
-                        </th>
-                        <th>Account</th>
-                        <th>Credit</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {creditTransactions.map((item, index) => {return creditTokenRow(item, index);})}
-                    </tbody>
-                    </table>
-                </div>
-                </div>
-            </div>
-            <div className="cont d-flex gap-2 mt-2">
-              <button
-                onClick={submit}
-                className="btn btn-info p-3 text-white w-100 button"
-              >
-                Submit
-              </button>
-              </div>
-            </div>
-            {/* <div className="d-flex gap-2 mt-2">
-              <button
-                onClick={submit}
-                className="btn btn-info p-3 text-white w-100"
-              >
-                Create Your Token
-              </button>
-              </div> */}
         </>
     );
 }
