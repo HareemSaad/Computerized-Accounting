@@ -31,7 +31,7 @@ export const FinancialStatement = () => {
         // ownerCapital = tablesIdName.filter(element => element.tableId == 300);
         // ownerWithdrawl = tablesIdName.filter(element => element.tableId == 400);
         revenues = tablesIdName.filter(element => element.tableId >= 500 && element.tableId < 600);
-        expenses = tablesIdName.filter(element => element.tableId >= 600);
+        expenses = tablesIdName.filter(element => element.tableId >= 600 && element.tableId < 700);
 
         OEAmount = fetchAmount(300, 400);
         OWAmount = fetchAmount(400);

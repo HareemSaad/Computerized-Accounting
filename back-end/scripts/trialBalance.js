@@ -28,6 +28,7 @@ const fetchIdDebCredAmount = async (AllTablesId) => {
     //variables
     let response = [];
     let allTablesValue = [];
+    // console.log("AlltablesId: ", AllTablesId);
 
     // function
     const queryPromise = new Promise(async (resolve, reject) => {
@@ -65,25 +66,33 @@ const fetchIdDebCredAmount = async (AllTablesId) => {
     
 };
 
-const calculateTrialBalance = async (AllTablesId) => {
+const calculateTrialBalance = async (AllTablesId, AllTablesName) => {
+    // console.log("AllTablesId: ", AllTablesId);
     let allTaccValues = await fetchIdDebCredAmount(AllTablesId);
+    // console.log("allTaccValues: ", allTaccValues);
     const valueObj = [];
     let calcDebCredAmount;
     
     allTaccValues.forEach((element, i) => {
         calcDebCredAmount = calculateDebitCredit(element.singleTableValues);
+        // console.log("element: ", element);
         // calcDebCredAmount = calculateDebitCredit(element);
         
         //insert values(t-account final calculation) in object
         if (calcDebCredAmount > 0) {
             valueObj.push({
-                "tableId": AllTablesId[i],
+                // "tableId": AllTablesId[i],
+                "tableId": element.tableId,
+                "tableName": AllTablesName[i],
                 "debit": calcDebCredAmount,
                 "credit": 0
             });
-        } else {
+        } 
+        else {
             valueObj.push({
-                "tableId": AllTablesId[i],
+                // "tableId": AllTablesId[i],
+                "tableId": element.tableId,
+                "tableName": AllTablesName[i],
                 "debit": 0,
                 "credit": Math.abs(calcDebCredAmount)
             });

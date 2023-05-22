@@ -5,16 +5,21 @@ import '../general-journal/style.css';
 
 export const TrialBalance = () => {
   // create use state
-  const [tablesNameId, setTablesNameId] = useState([]);
-  const [tablesDebitCredit, setTablesDebitCredit] = useState([]);
+  // const [tablesNameId, setTablesNameId] = useState([]);
+  // const [tablesDebitCredit, setTablesDebitCredit] = useState([]);
+  const [tablesInfo, setTablesInfo] = useState([]);
 
   // create use effect
   useEffect(() => {
     const fetchTablesInfo = async () => {
       await axios.get('http://localhost:3000/trial-balance')
         .then(response => {
-          setTablesNameId(response.data[0]);
-          setTablesDebitCredit(response.data[1]);
+          // setTablesNameId(response.data[0]);
+          // setTablesDebitCredit(response.data[1]);
+          const filterData = response.data.filter(element => !(element.debit === 0 && element.credit === 0))
+          setTablesInfo(filterData);
+          // console.log("filterData: ", filterData);
+          // console.log("response.data: ", response.data);
         })
         //.then(response => console.log(response.data[0]))
         .catch(err => console.log(err));
@@ -28,9 +33,9 @@ export const TrialBalance = () => {
 
       <tr key={index}>
         <td>{data.tableId}</td>
-        <td>{data.name}</td>
-        <td>{tablesDebitCredit[index].debit}</td>
-        <td>{tablesDebitCredit[index].credit}</td>
+        <td>{data.tableName}</td>
+        <td>{data.debit}</td>
+        <td>{data.credit}</td>
       </tr>
 
     )
@@ -38,7 +43,7 @@ export const TrialBalance = () => {
 
   const calculateFinalDebitCredit = () => {
     let debit = 0, credit = 0;
-    tablesDebitCredit.map((data, index) => {
+    tablesInfo.map((data, index) => {
       if (data.debit > 0) {
         debit += data.debit;
       }
@@ -75,7 +80,8 @@ export const TrialBalance = () => {
             </tr>
           </thead>
           <tbody>
-            {tablesNameId.map((item, index) => {
+            {tablesInfo.map((item, index) => {
+              
               return displayTable(item, index);
             })}
             {finalCalculation()}

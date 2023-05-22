@@ -48,12 +48,13 @@ function dropAllTables() {
     // });
 
     const deleteQuery = `
-        DROP TABLE IF EXISTS \`Heads\`, \`GeneralJournal\`, \`100\`, \`200\`, \`300\`, \`400\`, \`101\`, \`102\`, \`500\`, \`600\`, \`601\`
+        DROP TABLE IF EXISTS \`Heads\`, \`GeneralJournal\`, \`100\`, \`200\`, \`300\`, \`400\`, \`101\`, \`102\`, \`500\`, \`600\`, \`601\`, \`800\`
     `;
 
     // Execute the query to create the GeneralJournal table
     connection.query(deleteQuery, (err, result) => {
-        if (err) throw err;
+        // if (err) throw err;
+        if (err) console.log(err);
         console.log('Deleted!');
     });
 }
@@ -61,10 +62,23 @@ function dropAllTables() {
 function createGeneralJournalTable() {
 
     // Define the query to create the GeneralJournal table
+    // const createTableQuery = `
+    //     CREATE TABLE \`GeneralJournal\` (
+    //     \`transactionId\` int NOT NULL AUTO_INCREMENT,
+    //     \`date\` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    //     \`flag\` char(1) DEFAULT NULL,
+    //     \`description\` char(50) DEFAULT NULL,
+    //     \`creditAccount\` int,
+    //     \`debitAccount\` int,
+    //     \`amount\` decimal(10,2) DEFAULT NULL,
+    //     PRIMARY KEY (\`transactionId\`)
+    //     ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+    // `;
+
     const createTableQuery = `
         CREATE TABLE \`GeneralJournal\` (
         \`transactionId\` int NOT NULL AUTO_INCREMENT,
-        \`date\` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        \`date\` date NULL DEFAULT NULL,
         \`flag\` char(1) DEFAULT NULL,
         \`description\` char(50) DEFAULT NULL,
         \`creditAccount\` int,
@@ -80,7 +94,7 @@ function createGeneralJournalTable() {
         console.log('GeneralJournal table created successfully!');
     });
 }
-  
+
 function createTAcountTable(tableCode, tableName) {
 
     // Define the query to create the T-Accounts table
@@ -121,7 +135,7 @@ function addTableToHeadTable(tableCode, tableName) {
     });
     // console.log(output);
 }
-  
+
 module.exports = {
     createTAcountTable: createTAcountTable,
     createHeadsTable: createHeadsTable,

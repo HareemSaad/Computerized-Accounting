@@ -62,6 +62,7 @@ async function main() {
   // tableCreation.createTAcountTable(200, "Account Payable")
   //Expense
   // tableCreation.createTAcountTable(600, "Rent Expense")
+  // tableCreation.createTAcountTable(800, "Income Summary")
   // tableCreation.createTAcountTable(601, "Utility Expense")
   // tables deletion
   // tableCreation.dropAllTables()

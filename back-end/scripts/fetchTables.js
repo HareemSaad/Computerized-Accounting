@@ -130,7 +130,42 @@ const fetchHeadTablesId = async (req, res) => {
   }
 };
 
+const specificHeadTablesId = async (start, end, req, res) => {
+  let response = [];
+
+  // Define the query to fetch all tables
+  // const showTableQuery = `SELECT tableId FROM Heads WHERE tableId >= ${start} AND tableId < ${end} OR tableId = 800`;
+  const showTableQuery = `SELECT tableId FROM Heads WHERE tableId >= ${start} AND tableId < ${end}`;
+
+  // Execute the query and return a Promise
+  const queryPromise = new Promise((resolve, reject) => {
+    connection.query(showTableQuery, (error, results, fields) => {
+      if (error) {
+        reject(error);
+      } else {
+        response = results;
+        resolve(response);
+      }
+    });
+  });
+
+  // Wait for the query to complete and send the response
+  try {
+    const tablesId = [];
+    const tables = await queryPromise;
+    tables.forEach(item => {
+      tablesId.push(item.tableId);
+    })
+    
+    return (tablesId);
+  } catch (error) {
+    console.error(error.message);
+  }
+};
+
+
 module.exports = {
   fetchTables: fetchTables,
   fetchHeadTablesId: fetchHeadTablesId,
+  specificHeadTablesId: specificHeadTablesId
 };

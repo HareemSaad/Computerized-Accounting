@@ -7,6 +7,8 @@ import { TrialBalance } from './components/trial-balance';
 import { FinancialStatement } from './components/financial-statement';
 import { CreateAccount } from './components/create-account';
 import { Landing } from './components/landing';
+import { Closing } from './components/closing';
+import { ViewGeneralJournal } from './components/view-general-journal';
 import { ToastContainer } from "react-toastify";
 
 function App() {
@@ -18,7 +20,8 @@ function App() {
     "owner-withdrawal": 400,
     "revenue": 500,
     "expense": 600,
-    "contra-assets": 700
+    "contra-assets": 700,
+    "income-summary": 800
   })
 
   const [accountWeight, setAccountWeight] = useState({
@@ -28,7 +31,8 @@ function App() {
     "400": 'debit',
     "500": 'credit',
     "600": 'debit',
-    "700": 'credit'
+    "700": 'credit',
+    "800": ''
   })
 
   return (
@@ -40,6 +44,8 @@ function App() {
           <Route path="/trial-balance" element={<TrialBalance/>} /> 
           <Route path="/financial-statement" element={<FinancialStatement/>} /> 
           <Route path="/create-account" element={<CreateAccount accountTypes={accountTypes}/>} /> 
+          <Route path="/view-general-journal" element={<ViewGeneralJournal/>} /> 
+          <Route path="/closing" element={<Closing/>} /> 
       </Routes>
     </>
   );

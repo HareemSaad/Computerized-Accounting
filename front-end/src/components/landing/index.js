@@ -12,7 +12,7 @@ export const Landing = (props) => {
     const [card, setCard] = useState([]);
   
     useEffect(() => {
-      const cards = ["General Journal", "Trial Balance", "Financial Statements", "Create T-Accounts", "View T-Accounts"];
+      const cards = ["General Journal", "Trial Balance", "Financial Statements", "Create T-Accounts", "View General Journal", "Close Accounts"];
       setCard(cards)
     }, []);
 
@@ -22,6 +22,8 @@ export const Landing = (props) => {
         else if (card === 'Trial Balance') {navigate('/trial-balance')}
         else if (card === 'Financial Statements') {navigate('/financial-statement')}
         else if (card === 'Create T-Accounts') {navigate('/create-account')}
+        else if (card === 'Close Accounts') {navigate('/closing')}
+        else if (card === 'View General Journal') {navigate('/view-general-journal')}
         // else if (card === 'Financial Statements') {navigate('/financial-statement')}
         else {notify("error", "Route doesn't exist")}
     };
