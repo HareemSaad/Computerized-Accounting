@@ -56,11 +56,11 @@ async function main() {
   // tableCreation.createTAcountTable(100, "Cash")
   // tableCreation.createTAcountTable(101, "Supply")
   // tableCreation.createTAcountTable(102, "Land")
-  //Revenue
+  // //Revenue
   // tableCreation.createTAcountTable(500, "Rental Revenue")
-  //Liability
+  // //Liability
   // tableCreation.createTAcountTable(200, "Account Payable")
-  //Expense
+  // //Expense
   // tableCreation.createTAcountTable(600, "Rent Expense")
   // tableCreation.createTAcountTable(800, "Income Summary")
   // tableCreation.createTAcountTable(601, "Utility Expense")

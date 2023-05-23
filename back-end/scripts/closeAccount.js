@@ -105,7 +105,7 @@ const closeAccount = async (req, res) => {
 
   try {
     const tablesId = await fetchTables.specificHeadTablesId(300, 700);
-    const valuesObj = await trialBalance.calculateTrialBalance(tablesId, "");
+    const valuesObj = await trialBalance.calculateTrialBalance(tablesId, "", "");
     const ownerCapital = valuesObj.filter(element => element.tableId == 300);
     const ownerWithdrawl = valuesObj.filter(element => element.tableId == 400);
     const revenueExpense = valuesObj.filter(element => element.tableId >= 500 && element.tableId < 700);

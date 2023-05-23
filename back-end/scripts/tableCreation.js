@@ -21,7 +21,7 @@ function createHeadsTable() {
     CREATE TABLE \`Heads\` (
         \`tableId\` int NOT NULL,
         \`name\` varchar(25) DEFAULT NULL,
-        \`startFrom\` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        \`startFrom\` date NOT NULL,
         PRIMARY KEY (\`tableId\`)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
     `;
@@ -128,7 +128,10 @@ function addFkToGj(tableCode) {
 }
 
 function addTableToHeadTable(tableCode, tableName) {
-    const sql = `INSERT INTO Heads (tableId, name) VALUES ('${tableCode}', '${tableName}')`;
+
+    const date = new Date().toISOString().slice(0, 10);
+    console.log(date);
+    const sql = `INSERT INTO Heads (tableId, name, startFrom) VALUES ('${tableCode}', '${tableName}', '${date}')`;
     const output = connection.query(sql, (err, result) => {
         if (err) throw err;
         console.log("1 row inserted");

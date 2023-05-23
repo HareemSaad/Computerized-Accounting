@@ -21,7 +21,7 @@ const calculateDebitCredit = (result) => {
 }
 
 
-const fetchIdDebCredAmount = async (AllTablesId) => {
+const fetchIdDebCredAmount = async (AllTablesId, AllTablesStartFromDate) => {
     // receiving array with all tables Id
     // const AllTablesId = await fetchTables.fetchHeadTablesId();
 
@@ -33,8 +33,13 @@ const fetchIdDebCredAmount = async (AllTablesId) => {
     // function
     const queryPromise = new Promise(async (resolve, reject) => {
         try {
+            // const promises = AllTablesId.map(async (item, index) => {
+            //     const joinTaccGJ = `SELECT \`${item}\`.\`debit\` AS debit, \`${item}\`.\`credit\` AS credit, \`${item}\`.\`amount\` AS amount 
+            //     FROM \`${item}\` 
+            //     LEFT JOIN (SELECT * FROM \`GeneralJournal\` WHERE \`date\` > ${AllTablesStartFromDate[index]}) AS \`filtered_journal\` ON \`${item}\`.\`transactionId\` = \`filtered_journal\`.\`transactionId\``;
+                
             const promises = AllTablesId.map(async (item) => {
-                const joinTaccGJ = `SELECT \`${item}\`.\`debit\` AS debit, \`${item}\`.\`credit\` AS credit, \`${item}\`.\`amount\` AS amount FROM \`${item}\` JOIN \`GeneralJournal\` ON \`${item}\`.\`transactionId\` = \`GeneralJournal\`.\`transactionId\``;
+                const joinTaccGJ = `SELECT \`${item}\`.\`debit\` AS debit, \`${item}\`.\`credit\` AS credit, \`${item}\`.\`amount\` AS amount FROM \`${item}\` JOIN (SELECT * FROM \`GeneralJournal\` WHERE \`date\` > '2023-05-23') AS \`filtered_journal\` ON \`${item}\`.\`transactionId\` = \`filtered_journal\`.\`transactionId\``;
 
                 const promise = new Promise((resolve, reject) => {
                     connection.query(joinTaccGJ, (error, result) => {
@@ -66,9 +71,11 @@ const fetchIdDebCredAmount = async (AllTablesId) => {
     
 };
 
-const calculateTrialBalance = async (AllTablesId, AllTablesName) => {
+const calculateTrialBalance = async (AllTablesId, AllTablesName, AllTablesStartFromDate) => {
+    //bring head table convert to json
+    //
     // console.log("AllTablesId: ", AllTablesId);
-    let allTaccValues = await fetchIdDebCredAmount(AllTablesId);
+    let allTaccValues = await fetchIdDebCredAmount(AllTablesId, AllTablesStartFromDate);
     // console.log("allTaccValues: ", allTaccValues);
     const valueObj = [];
     let calcDebCredAmount;

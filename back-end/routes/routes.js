@@ -32,11 +32,13 @@ router.post("/closeAccount", closeAccount);
 router.get('/trial-balance', async (req, res) => {
   // const q1 = "SELECT tableId, name FROM Heads;SELECT `100`.`debit` AS debit, `100`.`credit` AS credit, `100`.`amount` AS amount FROM `100` JOIN `GeneralJournal` ON `100`.`transactionId` = `GeneralJournal`.`transactionId`";
 
-  const q1 = "SELECT tableId, name FROM Heads";
+  // const q1 = "SELECT tableId, name FROM Heads";
+  const q1 = "SELECT * FROM Heads";
 
   const dataArr = [];
   const AllTablesId = [];
   const AllTablesName = [];
+  const AllTablesStartFromDate = [];
   // const data2 = await trialBalance.allTablesId();
   // dataArr.push(data2);
   // console.log(data2);
@@ -48,10 +50,11 @@ router.get('/trial-balance', async (req, res) => {
       data.forEach(element => {
         AllTablesId.push(element.tableId);
         AllTablesName.push(element.name);
+        AllTablesStartFromDate.push(element.startFrom);
         // console.log(element);
       });
       // const data2 = await trialBalance.allTablesId(AllTablesId);
-      const data2 = await trialBalance.calculateTrialBalance(AllTablesId, AllTablesName);
+      const data2 = await trialBalance.calculateTrialBalance(AllTablesId, AllTablesName, AllTablesStartFromDate);
       // dataArr.push(data2);
       // console.log("data2: ", data2);
       // console.log("-------------------------------------");

@@ -97,7 +97,7 @@ const insertData = async (req, res) => {
     // get trial balance for each table to get there cummulative debit / credit
     let data;
     const getTrialBalance = async () => {
-      data = await trialBalance.calculateTrialBalance(tableIds, "");
+      data = await trialBalance.calculateTrialBalance(tableIds, "", "");
     }
     // when you get the trial balance then
     getTrialBalance().then(async () => {
