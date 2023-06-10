@@ -20,7 +20,7 @@ function createHeadsTable() {
     const createTableQuery = `
     CREATE TABLE \`Heads\` (
         \`tableId\` int NOT NULL,
-        \`name\` varchar(25) DEFAULT NULL,
+        \`name\` varchar(50) DEFAULT NULL,
         \`startFrom\` date NOT NULL,
         PRIMARY KEY (\`tableId\`)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
@@ -47,8 +47,12 @@ function dropAllTables() {
     //     console.log('Connected to the MySQL server!');
     // });
 
+    // const deleteQuery = `
+    //     DROP TABLE IF EXISTS \`Heads\`, \`GeneralJournal\`, \`100\`, \`200\`, \`300\`, \`400\`, \`101\`, \`102\`, \`500\`, \`600\`, \`601\`, \`800\`
+    // `;
+
     const deleteQuery = `
-        DROP TABLE IF EXISTS \`Heads\`, \`GeneralJournal\`, \`100\`, \`200\`, \`300\`, \`400\`, \`101\`, \`102\`, \`500\`, \`600\`, \`601\`, \`800\`
+    DROP TABLE IF EXISTS \`Heads\`, \`GeneralJournal\`, \`100\`, \`101\`, \`102\`, \`103\`, \`104\`, \`105\`, \`200\`,\`201\`,\`202\`, \`300\`, \`400\`, \`500\`, \`600\`, \`601\`, \`602\`, \`603\`, \`604\`, \`605\`, \`606\`, \`607\`, \`700\`, \`701\`, \`800\`
     `;
 
     // Execute the query to create the GeneralJournal table

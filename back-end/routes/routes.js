@@ -62,7 +62,7 @@ router.get('/trial-balance', async (req, res) => {
       // console.log(data);
       res.send(data2);
       console.log("data sent");
-    };
+    }
   });
 
 });
@@ -71,11 +71,13 @@ router.get("/financial-statement", async (req, res) => {
   // const q = "SELECT tableId, name FROM Heads WHERE tableId >= 500 AND tableId < 600;SELECT tableId, name FROM Heads WHERE tableId >= 600";
   
   const dataArr = [];
-  const q = "SELECT tableId, name FROM Heads WHERE tableId >= 500";
+  // const q = "SELECT tableId, name FROM Heads WHERE tableId >= 500";
+  const q = "SELECT tableId, name FROM Heads";
   connection.query(q, async (err, data) => {
     if (err) console.log(err);
     dataArr.push(data);
     const data2 = await financialStatement.fetchIdTotalAmount();
+    // const dataArr3 = await financialStatement.responseData(data, data2);
     dataArr.push(data2);
     res.send(dataArr);
   });
@@ -83,11 +85,21 @@ router.get("/financial-statement", async (req, res) => {
 
 router.get("/view-general-journal", (req, res) => {
   // connection.query("SELECT * FROM GeneralJournal WHERE date = '2023-05-20'; SELECT tableId, name FROM Heads", async (err, data) => {
-  connection.query("SELECT * FROM GeneralJournal; SELECT tableId, name FROM Heads", (err, data) => {
-    if (err) console.log(err);
-    res.send(data);
-    console.log("data sent to view general journal");
-  });
+  const q = "SELECT startFrom FROM Heads WHERE tableId = 800";
+  connection.query(q, (error, result) => {
+    if (error) throw(error);
+    else {
+      const date = result[0].startFrom.toISOString().slice(0, 10);
+      //const date = result[0].startFrom;
+      // console.log(result[0].startFrom.toISOString().slice(0, 10));
+      console.log("date: ", date);
+      connection.query(`SELECT * FROM GeneralJournal WHERE date > '${date}'; SELECT tableId, name FROM Heads`, (err, data) => {
+        if (err) console.log(err);
+        res.send(data);
+        console.log("data sent to view general journal");
+      });
+    }
+  })
 })
 
 module.exports = {

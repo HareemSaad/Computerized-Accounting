@@ -18,7 +18,7 @@ export const TrialBalance = () => {
           // setTablesDebitCredit(response.data[1]);
           const filterData = response.data.filter(element => !(element.debit === 0 && element.credit === 0))
           setTablesInfo(filterData);
-          // console.log("filterData: ", filterData);
+          console.log("filterData: ", filterData);
           // console.log("response.data: ", response.data);
         })
         //.then(response => console.log(response.data[0]))

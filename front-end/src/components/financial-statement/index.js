@@ -7,7 +7,8 @@ export const FinancialStatement = () => {
 
     const [tablesIdName, setTablesIdName] = useState([]);
     const [tablesIdAmount, setTablesIdAmount] = useState([]);
-    // let assets = [], liabilities = [], ownerCapital = [], let ownerWithdrawl = [];
+    let assets = [], liabilities = [], contraAssets = [];
+    // let ownerCapital = [], let ownerWithdrawl = [];
     let revenues = [], expenses = [];
     let OEAmount = 0, OWAmount = 0, Net = 0, OETotal = 0;
 
@@ -15,23 +16,57 @@ export const FinancialStatement = () => {
         const fetchTablesInfo = async () => {
             await axios.get('http://localhost:3000/financial-statement')
                 .then(response => {
-                    setTablesIdName(response.data[0]);
-                    setTablesIdAmount(response.data[1]);
+                    // const filterData = response.data[1].filter(element => !(element.amount == 0));
+                    
+                    // console.log("filterData: ", filterData);
+                    console.log("response.data[0]: ",response.data[1]);
+
+                    const matchedData = response.data[0].filter( 
+                        item => response.data[1].some(data => data.tableId === item.tableId)
+                      );
+                      
+                    console.log("matchedData: ", matchedData)
+
+
+
+
+
+                    setTablesIdName(matchedData); // matchedData has table name and id
+                    setTablesIdAmount(response.data[1]); // filter data has values that arent 0
+
+                    // setTablesIdName(response.data[0]);
+                    // setTablesIdAmount(filterData);
+                    // console.log(response.data[0]);
+                    // console.log(response.data[1]);
                 })
                 .catch(err => console.log(err));
-        }
+            }
         fetchTablesInfo();
     }, []);
-
+    
 
     const splitVaues = () => {
         // 100s asset - 200s liability - 300 OE - 400 OW - 500s Revenue - 600s Expense
-        // assets = tablesIdName.filter(element => element.tableId < 200);
-        // liabilities = tablesIdName.filter(element => element.tableId >= 200 && element.tableId < 300);
+        // let i = 0;
+        // // const filterDataId = tablesIdName.filter((element, index) => (element.tableId === tablesIdAmount[index].tableId));
+        // const filterDataId = [];
+        // tablesIdName.map((element, index) => {
+        //     console.log(element);
+        //     // if (element.tableId == tablesIdAmount[index].tableId) {
+        //     //     filterDataId.push(element);
+        //     // }
+        //     console.log(tablesIdAmount[0]);
+        // })
+        // console.log("filterDataId: ", filterDataId);
+
+
+        assets = tablesIdName.filter(element => element.tableId < 200);
+        liabilities = tablesIdName.filter(element => element.tableId >= 200 && element.tableId < 300);
         // ownerCapital = tablesIdName.filter(element => element.tableId == 300);
         // ownerWithdrawl = tablesIdName.filter(element => element.tableId == 400);
         revenues = tablesIdName.filter(element => element.tableId >= 500 && element.tableId < 600);
         expenses = tablesIdName.filter(element => element.tableId >= 600 && element.tableId < 700);
+        contraAssets = tablesIdName.filter(element => element.tableId >= 700 && element.tableId < 800);
 
         OEAmount = fetchAmount(300, 400);
         OWAmount = fetchAmount(400);
@@ -53,8 +88,8 @@ export const FinancialStatement = () => {
     const displayTable = (data, index) => {
         return (
             <tr key={index}>
-                <td>{data.tableId}</td>
-                <td>{data.name}</td>
+                <td>{data.tableId} </td>
+                <td>{data.name} </td>
                 <td>{fetchAmount(data.tableId)}</td>
             </tr>
         )
@@ -147,7 +182,7 @@ export const FinancialStatement = () => {
                         <tr>
                             <td>Net</td>
                             {/* <td>{totalAmount(500, 600) - totalAmount(600, 700)}</td> */}
-                            <td>{(Net > 0) ? (Net) : `(${Math.abs(Net)})` }</td>
+                            <td>{(Net > 0) ? (Net) : `(${Math.abs(Net)})`}</td>
                         </tr>
                         <tr>
                             <td>Owner Withdrawl</td>
@@ -169,14 +204,45 @@ export const FinancialStatement = () => {
                 <table className="table table-bordered">
                     <thead>
                         <tr>
+                            <th></th>
                             <th>Assets (A) =</th>
                             <th>Liabilities (L) + Owner Equity (OE) </th>
                         </tr>
                     </thead>
                     <tbody>
+
                         <tr>
+                            <td></td>
                             <td>
-                                {totalAmount(100, 200)}
+                                {assets.map((item, index) => {
+                                
+                                  return displayTable(item, index);
+                                
+                                })}
+                                {contraAssets.map((data, index) => {
+                                    return (
+                                        <tr key={index}>
+
+                                            <td>{data.tableId}  - </td>
+                                            <td>{data.name}  - </td>
+                                            <td>({fetchAmount(data.tableId)})</td>
+                                        </tr>
+                                        
+                                    )
+                                })}
+                            </td>
+                            <td>
+                                {liabilities.map((item, index) => {
+                                    return displayTable(item, index);
+                                })}
+                                Owner Equity {OETotal}
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td><em>Total</em></td>
+                            <td>
+                                {totalAmount(100, 200) - totalAmount(700, 800)}
                             </td>
                             <td>
                                 {totalAmount(200, 300) + OETotal}

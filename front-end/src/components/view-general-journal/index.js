@@ -48,7 +48,7 @@ export const ViewGeneralJournal = () => {
     }
 
     return (
-        <div className='content'>
+        <div className=''>
             <h1>General Journal</h1>
             <div className="cont">
                 <table className="table table-bordered">

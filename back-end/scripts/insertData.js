@@ -1,6 +1,7 @@
 const mysql = require('mysql');
 const dotenv = require('dotenv').config()
 const trialBalance = require('./../scripts/trialBalance.js');
+const fetchTables = require('./fetchTables.js');
 
 const connection = mysql.createConnection({
   host: process.env.DB_SERVER,
@@ -90,14 +91,20 @@ const insertData = async (req, res) => {
   // console.log("------------------------");
   const { creditTransactions, debitTransactions, description, txnFlag, accountWeight, tableIds } = req.body
   // let date = new Date().toISOString().slice(0, 19).replace('T', ' ');
-  let date = new Date().toISOString().slice(0, 10).replace('T', ' ');
+  // let date = new Date().toISOString().slice(0, 10).replace('T', ' ');
+  let date = "2023-06-25";
 
-  console.log(tableIds);
+  console.log("tableIds: ", tableIds);
   try {
     // get trial balance for each table to get there cummulative debit / credit
     let data;
+    const info = await fetchTables.specificHeadTableStartFrom(tableIds);
+    console.log("-------------------------------------");
+    console.log("info: ",info)
+    console.log("-------------------------------------");
     const getTrialBalance = async () => {
-      data = await trialBalance.calculateTrialBalance(tableIds, "", "");
+      // data = await trialBalance.calculateTrialBalance(tableIds, "", "");
+      data = await trialBalance.calculateTrialBalance(tableIds, "", info.tableStartFrom);
     }
     // when you get the trial balance then
     getTrialBalance().then(async () => {

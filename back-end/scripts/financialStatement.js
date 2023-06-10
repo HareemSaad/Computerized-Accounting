@@ -13,17 +13,18 @@ const trialBalance = require('./trialBalance');
 
 const fetchIdTotalAmount = async () => {
     // receiving array with all tables Id
-    const AllTablesId = await fetchTables.fetchHeadTablesId();
-    let allTaccValues = await trialBalance.fetchIdDebCredAmount(AllTablesId);
+    const AllTablesInfo = await fetchTables.fetchHeadTablesId();
+    let allTaccValues = await trialBalance.fetchIdDebCredAmount(AllTablesInfo.AllTablesId, AllTablesInfo.tableStartFrom);
     let valuesObj = [], calcAmount = 0;
 
     allTaccValues.forEach((element, index) => {
-        calcAmount = trialBalance.calculateDebitCredit(element.singleTableValues);
-
-        valuesObj.push({
-            "tableId": element.tableId,
-            "amount": Math.abs(calcAmount)
-        })
+        calcAmount = trialBalance.calculateDebitCredit(element.singleTableValues, "", AllTablesInfo.tableStartFrom);
+        if (calcAmount !== 0) {
+            valuesObj.push({
+                "tableId": element.tableId,
+                "amount": Math.abs(calcAmount)
+            })
+        }
     });
     return(valuesObj);
 }

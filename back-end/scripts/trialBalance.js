@@ -24,6 +24,9 @@ const calculateDebitCredit = (result) => {
 const fetchIdDebCredAmount = async (AllTablesId, AllTablesStartFromDate) => {
     // receiving array with all tables Id
     // const AllTablesId = await fetchTables.fetchHeadTablesId();
+    // console.log("AllTablesStartFromDate: ", AllTablesStartFromDate[0].toISOString().slice(0, 10));
+    // console.log("type AllTablesStartFromDate: ", typeof(AllTablesStartFromDate[0]));
+    // new Date().toISOString().slice(0, 10).replace('T', ' ');
 
     //variables
     let response = [];
@@ -38,8 +41,11 @@ const fetchIdDebCredAmount = async (AllTablesId, AllTablesStartFromDate) => {
             //     FROM \`${item}\` 
             //     LEFT JOIN (SELECT * FROM \`GeneralJournal\` WHERE \`date\` > ${AllTablesStartFromDate[index]}) AS \`filtered_journal\` ON \`${item}\`.\`transactionId\` = \`filtered_journal\`.\`transactionId\``;
                 
-            const promises = AllTablesId.map(async (item) => {
-                const joinTaccGJ = `SELECT \`${item}\`.\`debit\` AS debit, \`${item}\`.\`credit\` AS credit, \`${item}\`.\`amount\` AS amount FROM \`${item}\` JOIN (SELECT * FROM \`GeneralJournal\` WHERE \`date\` > '2023-05-23') AS \`filtered_journal\` ON \`${item}\`.\`transactionId\` = \`filtered_journal\`.\`transactionId\``;
+            // const promises = AllTablesId.map(async (item) => {
+            //     const joinTaccGJ = `SELECT \`${item}\`.\`debit\` AS debit, \`${item}\`.\`credit\` AS credit, \`${item}\`.\`amount\` AS amount FROM \`${item}\` JOIN (SELECT * FROM \`GeneralJournal\` WHERE \`date\` > '2023-05-23') AS \`filtered_journal\` ON \`${item}\`.\`transactionId\` = \`filtered_journal\`.\`transactionId\``;
+            const promises = AllTablesId.map(async (item, index) => {
+                const startDate = AllTablesStartFromDate[index].toISOString().slice(0, 10);
+                const joinTaccGJ = `SELECT \`${item}\`.\`debit\` AS debit, \`${item}\`.\`credit\` AS credit, \`${item}\`.\`amount\` AS amount FROM \`${item}\` JOIN (SELECT * FROM \`GeneralJournal\` WHERE \`date\` > '${startDate}') AS \`filtered_journal\` ON \`${item}\`.\`transactionId\` = \`filtered_journal\`.\`transactionId\``;
 
                 const promise = new Promise((resolve, reject) => {
                     connection.query(joinTaccGJ, (error, result) => {
