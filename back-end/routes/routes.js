@@ -83,16 +83,26 @@ router.get("/financial-statement", async (req, res) => {
   });
 })
 
+function convertDateFormat(dateString) {
+  dateString = dateString.trim();
+  const dateParts = dateString.split(/[/, ]+/);
+  const year = dateParts[2];
+  const month = dateParts[0] < 10 ? "0" + dateParts[0] : dateParts[0];
+  const day = dateParts[1] < 10 ? "0" + dateParts[1] : dateParts[1];
+
+  return `${year}-${month}-${day}`;
+}
+
+
 router.get("/view-general-journal", (req, res) => {
   // connection.query("SELECT * FROM GeneralJournal WHERE date = '2023-05-20'; SELECT tableId, name FROM Heads", async (err, data) => {
   const q = "SELECT startFrom FROM Heads WHERE tableId = 800";
   connection.query(q, (error, result) => {
     if (error) throw(error);
     else {
-      const date = result[0].startFrom.toISOString().slice(0, 10);
+      const date = convertDateFormat(result[0].startFrom.toLocaleString());
       //const date = result[0].startFrom;
       // console.log(result[0].startFrom.toISOString().slice(0, 10));
-      console.log("date: ", date);
       connection.query(`SELECT * FROM GeneralJournal WHERE date > '${date}'; SELECT tableId, name FROM Heads`, (err, data) => {
         if (err) console.log(err);
         res.send(data);

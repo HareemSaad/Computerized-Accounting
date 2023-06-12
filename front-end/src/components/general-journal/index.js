@@ -345,7 +345,6 @@ export const GeneralJournal = (props) => {
                 label="Flag"
                 >
                 <MenuItem value="A" name='ADJ'>Adjustment</MenuItem>
-                <MenuItem value="C" name='CLO'>Closing</MenuItem>
                 <MenuItem value="N" name='NOR'>Normal</MenuItem>
                 </Select>
             </FormControl>

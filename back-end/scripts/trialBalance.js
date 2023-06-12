@@ -20,6 +20,15 @@ const calculateDebitCredit = (result) => {
     return (amount);
 }
 
+function convertDateFormat(dateString) {
+    dateString = dateString.trim();
+    const dateParts = dateString.split(/[/, ]+/);
+    const year = dateParts[2];
+    const month = dateParts[0] < 10 ? "0" + dateParts[0] : dateParts[0];
+    const day = dateParts[1] < 10 ? "0" + dateParts[1] : dateParts[1];
+  
+    return `${year}-${month}-${day}`;
+  }
 
 const fetchIdDebCredAmount = async (AllTablesId, AllTablesStartFromDate) => {
     // receiving array with all tables Id
@@ -44,7 +53,9 @@ const fetchIdDebCredAmount = async (AllTablesId, AllTablesStartFromDate) => {
             // const promises = AllTablesId.map(async (item) => {
             //     const joinTaccGJ = `SELECT \`${item}\`.\`debit\` AS debit, \`${item}\`.\`credit\` AS credit, \`${item}\`.\`amount\` AS amount FROM \`${item}\` JOIN (SELECT * FROM \`GeneralJournal\` WHERE \`date\` > '2023-05-23') AS \`filtered_journal\` ON \`${item}\`.\`transactionId\` = \`filtered_journal\`.\`transactionId\``;
             const promises = AllTablesId.map(async (item, index) => {
-                const startDate = AllTablesStartFromDate[index].toISOString().slice(0, 10);
+                // const startDate = AllTablesStartFromDate[index].toISOString().slice(0, 10);
+                const startDate = convertDateFormat(AllTablesStartFromDate[index].toLocaleString())
+                console.log("from trial balance :: ", startDate);
                 const joinTaccGJ = `SELECT \`${item}\`.\`debit\` AS debit, \`${item}\`.\`credit\` AS credit, \`${item}\`.\`amount\` AS amount FROM \`${item}\` JOIN (SELECT * FROM \`GeneralJournal\` WHERE \`date\` > '${startDate}') AS \`filtered_journal\` ON \`${item}\`.\`transactionId\` = \`filtered_journal\`.\`transactionId\``;
 
                 const promise = new Promise((resolve, reject) => {

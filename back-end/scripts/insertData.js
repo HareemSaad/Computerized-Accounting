@@ -92,7 +92,7 @@ const insertData = async (req, res) => {
   const { creditTransactions, debitTransactions, description, txnFlag, accountWeight, tableIds } = req.body
   // let date = new Date().toISOString().slice(0, 19).replace('T', ' ');
   // let date = new Date().toISOString().slice(0, 10).replace('T', ' ');
-  let date = "2023-06-25";
+  let date = "2023-06-15";
 
   console.log("tableIds: ", tableIds);
   try {

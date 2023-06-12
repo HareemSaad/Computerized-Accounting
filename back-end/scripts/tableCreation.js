@@ -52,7 +52,7 @@ function dropAllTables() {
     // `;
 
     const deleteQuery = `
-    DROP TABLE IF EXISTS \`Heads\`, \`GeneralJournal\`, \`100\`, \`101\`, \`102\`, \`103\`, \`104\`, \`105\`, \`200\`,\`201\`,\`202\`, \`300\`, \`400\`, \`500\`, \`600\`, \`601\`, \`602\`, \`603\`, \`604\`, \`605\`, \`606\`, \`607\`, \`700\`, \`701\`, \`800\`
+    DROP TABLE IF EXISTS \`Heads\`, \`GeneralJournal\`, \`100\`, \`101\`, \`102\`, \`103\`, \`104\`, \`105\`, \`200\`,\`201\`,\`202\`, \`300\`, \`400\`, \`500\`, \`501\`, \`600\`, \`601\`, \`602\`, \`603\`, \`604\`, \`605\`, \`606\`, \`607\`, \`700\`, \`701\`, \`800\`
     `;
 
     // Execute the query to create the GeneralJournal table
@@ -131,9 +131,19 @@ function addFkToGj(tableCode) {
     });
 }
 
+function getYesterday() {
+    const today = new Date();
+    const yesterday = new Date(today);
+    yesterday.setDate(today.getDate() - 1);
+    const yyyy = yesterday.getFullYear();
+    const mm = String(yesterday.getMonth() + 1).padStart(2, '0');
+    const dd = String(yesterday.getDate()).padStart(2, '0');
+    return `${yyyy}-${mm}-${dd}`;
+  }
+
 function addTableToHeadTable(tableCode, tableName) {
 
-    const date = new Date().toISOString().slice(0, 10);
+    const date = getYesterday();
     console.log(date);
     const sql = `INSERT INTO Heads (tableId, name, startFrom) VALUES ('${tableCode}', '${tableName}', '${date}')`;
     const output = connection.query(sql, (err, result) => {
