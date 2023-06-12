@@ -113,7 +113,7 @@ const closeIncomeWithdraw = async (account, ownerCapital, name) => {
 const updateStartFromDate = (accountsArray) => {
   // console.log(tableStartFrom[0].toISOString().slice(0, 10));
   // UPDATE `Heads` SET `startFrom` = '2023-06-10' WHERE `Heads`.`tableId` = 800; 
-  const date = "2023-06-15";
+  const date = "2023-07-10";
   // let date = new Date().toISOString().slice(0, 10).replace('T', ' ');
   accountsArray.map(async (item, index) => {
     const updateQuery = 'UPDATE Heads SET startFrom = ? WHERE tableId = ?';
