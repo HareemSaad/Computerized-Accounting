@@ -80,7 +80,6 @@ async function main() {
   // tableCreation.createTAcountTable(100, "Cash")
   // tableCreation.createTAcountTable(101, "Office Supplies")
   // tableCreation.createTAcountTable(102, "Land")
-  tableCreation.createTAcountTable(106, "Building")
   // tableCreation.createTAcountTable(103, "Prepaid Insurance")
   // tableCreation.createTAcountTable(104, "Equipment")
   // tableCreation.createTAcountTable(105, "Accounts Receivable")
